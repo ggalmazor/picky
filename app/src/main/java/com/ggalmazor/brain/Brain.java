@@ -20,7 +20,7 @@ public class Brain {
         return new Brain(acronyms, new ConcurrentHashMap<>());
     }
 
-    public static Brain randomAcronyms() {
+    public static Brain random() {
         return new Brain(new RandomAcronyms(), new ConcurrentHashMap<>());
     }
 
