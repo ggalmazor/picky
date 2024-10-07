@@ -1,0 +1,29 @@
+{
+  "name": "picky",
+  "version": "1.0.0",
+  "description": "(nit)Picky is a Slack app that explains acronyms",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ggalmazor/picky.git"
+  },
+  "author": "guille@ggalmazor.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ggalmazor/picky/issues"
+  },
+  "homepage": "https://github.com/ggalmazor/picky#readme",
+  "dependencies": {
+    "@slack/bolt": "^3.22.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.13",
+    "hamjest": "^4.1.0",
+    "jest": "^29.7.0"
+  }
+}
