@@ -12,21 +12,21 @@ import static org.hamcrest.Matchers.equalTo;
 class RandomAcronymsTest {
 
     @Nested
-    @DisplayName("getDescription()")
-    class GetDescription {
+    @DisplayName("getdefinition()")
+    class Getdefinition {
         @Test
-        void returns_a_description_for_the_provided_acronym() {
-            assertThat(new RandomAcronyms(new Random(12345L)).getDescription("ABC"), equalTo("Astute Bold Cricket"));
+        void returns_a_definition_for_the_provided_acronym() {
+            assertThat(new RandomAcronyms(new Random(12345L)).getDefinition("ABC"), equalTo("Astute Bold Cricket"));
         }
 
         @Test
         void assigns_words_randomly() {
-            assertThat(new RandomAcronyms(new Random(54321L)).getDescription("ABC"), equalTo("Agile Boisterous Clown"));
+            assertThat(new RandomAcronyms(new Random(54321L)).getDefinition("ABC"), equalTo("Agile Boisterous Clown"));
         }
 
         @Test
         void supports_characters_not_in_the_alphabet() {
-            assertThat(new RandomAcronyms(new Random(12345L)).getDescription("*.,"), equalTo("Nimble Alluring Unicycle"));
+            assertThat(new RandomAcronyms(new Random(12345L)).getDefinition("*.,"), equalTo("Nimble Alluring Unicycle"));
         }
     }
 }

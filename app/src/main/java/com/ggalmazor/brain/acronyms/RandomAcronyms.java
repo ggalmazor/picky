@@ -1,13 +1,11 @@
 package com.ggalmazor.brain.acronyms;
 
-import com.ggalmazor.brain.Acronyms;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 /**
- * Acronyms implementation that returns random acronym descriptions
+ * Acronyms implementation that returns random acronym definition
  */
 public class RandomAcronyms implements Acronyms {
     private static final Map<Character, String[]> ADJECTIVES = new HashMap<>();
@@ -92,25 +90,25 @@ public class RandomAcronyms implements Acronyms {
     }
 
     /**
-     * Returns a random description for the provided acronym
+     * Returns a random definition for the provided acronym
      *
      * @param acronym
-     * @return the acronym's (random) description
+     * @return the acronym's (random) definition
      */
     @Override
-    public String getDescription(String acronym) {
-        StringBuilder description = new StringBuilder();
+    public String getDefinition(String acronym) {
+        StringBuilder definition = new StringBuilder();
 
         for (int i = 0; i < acronym.length() - 1; i++) {
             char letter = Character.toUpperCase(acronym.charAt(i));
             String adjective = randomAdjectiveFor(ADJECTIVES, letter);
-            description.append(adjective).append(" ");
+            definition.append(adjective).append(" ");
         }
 
         char lastLetter = Character.toUpperCase(acronym.charAt(acronym.length() - 1));
-        description.append(randomAdjectiveFor(NOUNS, lastLetter));
+        definition.append(randomAdjectiveFor(NOUNS, lastLetter));
 
-        return description.toString();
+        return definition.toString();
     }
 
     private String randomAdjectiveFor(Map<Character, String[]> wordsMap, char letter) {

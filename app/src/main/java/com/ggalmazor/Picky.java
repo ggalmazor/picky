@@ -4,17 +4,18 @@
 package com.ggalmazor;
 
 import com.ggalmazor.brain.Brain;
+import com.ggalmazor.command.Command;
+import com.ggalmazor.command.Commands;
+import com.ggalmazor.reply.Replies;
+import com.ggalmazor.reply.Reply;
 import com.slack.api.bolt.App;
 import com.slack.api.bolt.AppConfig;
 import com.slack.api.bolt.jetty.SlackAppServer;
-import com.slack.api.methods.MethodsClient;
-import com.slack.api.methods.SlackApiException;
+import com.slack.api.model.event.AppMentionEvent;
 import com.slack.api.model.event.MessageEvent;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.regex.Pattern;
+import java.util.Optional;
 
 public class Picky {
     public static void main(String[] args) throws Exception {
@@ -26,24 +27,25 @@ public class Picky {
 
         var brain = Brain.random();
 
-        Pattern acronymPattern = Pattern.compile("([A-Z]{2,5})");
+        Replies.initialize();
         app.event(MessageEvent.class, (payload, ctx) -> {
-            MethodsClient client = ctx.client();
             MessageEvent event = payload.getEvent();
-            List<String> acronyms = acronymPattern.matcher(event.getText()).results().map(result -> result.group(1)).toList();
+            if (event.getText().contains(ctx.getBotUserId())) return ctx.ack();
 
-            acronyms.forEach(acronym -> {
-                var descriptions = brain.getDescriptions(acronym);
-                var text = descriptions.size() == 1
-                        ? acronym + " stands for:\n```" + String.join("\n", descriptions) + "\n```"
-                        : acronym + " stands for: " + descriptions.getFirst();
-                try {
-                    client.chatPostMessage(r -> r.channel(event.getChannel()).text(text));
-                } catch (IOException | SlackApiException e) {
-                    ctx.logger.error("Error sending response", e);
-                }
-            });
+            Optional<Reply> maybeReply = Replies.get(brain, event);
+            if (maybeReply.isEmpty()) return ctx.ack();
 
+            maybeReply.get().accept(ctx, event);
+            return ctx.ack();
+        });
+
+        Commands.initialize();
+        app.event(AppMentionEvent.class, (payload, ctx) -> {
+            AppMentionEvent event = payload.getEvent();
+            Optional<Command> maybeCommand = Commands.get(brain, event);
+            if (maybeCommand.isEmpty()) return ctx.ack();
+
+            maybeCommand.get().accept(ctx, event);
             return ctx.ack();
         });
 
