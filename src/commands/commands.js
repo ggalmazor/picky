@@ -12,6 +12,9 @@ export default class Commands {
 
   get(event) {
     const CommandConstructor = COMMANDS.find(Command => Command.test(event));
+    if (CommandConstructor=== undefined)
+      return;
+
     return new CommandConstructor(this.brain, this.client, this.logger);
   }
 }

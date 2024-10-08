@@ -15,22 +15,23 @@ const brain = Brain.random(app.logger);
 const replies = new Replies(brain, app.client, app.logger);
 const commands = new Commands(brain, app.client, app.logger);
 
-app.event("message_event", async ({event, client, logger, ack}) => {
+app.event("message", async ({event, context, say}) => {
+  if (event.text.includes(context.botUserId))
+    return;
+
   const reply = replies.get(event);
   if (reply === undefined)
-    return await ack();
+    return;
 
-  await reply.accept(event);
-  await ack();
+  await reply.accept(event, say);
 });
 
-app.event("app_mention_event", async ({event, client, logger, say, ack}) => {
+app.event("app_mention", async ({event}) => {
   const command = commands.get(event);
   if (command === undefined)
-    return await ack();
+    return;
 
   await command.accept(event);
-  await ack();
 });
 
 await app.start(process.env.PORT || 3000);

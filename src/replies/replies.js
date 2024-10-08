@@ -11,6 +11,9 @@ export default class Replies {
 
   get(event) {
     const ReplyConstructor = REPLIES.find(Reply => Reply.test(event));
+    if (ReplyConstructor=== undefined)
+      return;
+
     return new ReplyConstructor(this.brain, this.client, this.logger);
   }
 }
