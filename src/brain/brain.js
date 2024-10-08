@@ -7,14 +7,6 @@ export default class Brain {
     this.logger = logger;
   }
 
-  static empty(acronyms) {
-    return new Brain(acronyms, {}, logger);
-  }
-
-  static random(logger) {
-    return new Brain(new RandomAcronyms(), {}, logger);
-  }
-
   getDefinitions(acronym) {
     if (acronym in this.memory)
       return this.memory[acronym];

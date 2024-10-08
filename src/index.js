@@ -1,8 +1,6 @@
 import bolt from "@slack/bolt";
 import 'dotenv/config'
-import Brain from "./brain/brain.js";
-import Commands from "./commands/commands.js";
-import Replies from "./replies/replies.js";
+import Picky from "./picky/picky.js";
 
 const app = new bolt.App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -11,27 +9,14 @@ const app = new bolt.App({
   appToken: process.env.SLACK_APP_TOKEN
 });
 
-const brain = Brain.random(app.logger);
-const replies = new Replies(brain, app.logger);
-const commands = new Commands(brain, app.client, app.logger);
+const picky = Picky.from(app);
 
 app.event("message", async ({event, context, say}) => {
-  if (event.text.includes(context.botUserId))
-    return;
-
-  const reply = replies.get(event);
-  if (reply === undefined)
-    return;
-
-  await reply.accept(event, say);
+  return picky.onMessage(event, context, say);
 });
 
 app.event("app_mention", async ({event}) => {
-  const command = commands.get(event);
-  if (command === undefined)
-    return;
-
-  await command.accept(event);
+  return picky.onAppMention(event);
 });
 
 await app.start(process.env.PORT || 3000);

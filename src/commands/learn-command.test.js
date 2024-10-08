@@ -14,15 +14,15 @@ describe('LearnCommand', () => {
   });
 
   describe("apply", () => {
-    let brain, logger, client, subject;
+    let brain, client, logger, subject;
 
     beforeEach(() => {
       brain = new Brain(new RandomAcronyms(), {
         "HTML": ["Hyper Text Markup Language"],
         "API": ["Application Programming Interface"]
       });
-      logger = new TestLogger();
       client = testSlackClient();
+      logger = new TestLogger();
       subject = new LearnCommand(brain, client, logger);
     });
 

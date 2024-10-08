@@ -20,4 +20,10 @@ describe('RandomAcronyms', () => {
       assertThat(subject.define("ABC"), equalTo("Agile Bouncy Coyote"));
     });
   });
+
+  it('supports characters not between A-Z', () => {
+    withDeterministicRandom(() => {
+      assertThat(subject.define("ÐĮØ"), equalTo("Alluring Buoyant Cupcake"));
+    });
+  })
 });

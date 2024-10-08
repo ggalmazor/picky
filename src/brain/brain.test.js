@@ -53,6 +53,7 @@ describe('Brain', () => {
       const subject = new Brain(new RandomAcronyms(), {"ABC": ["Agile Bouncy Coyote"]});
 
       subject.forget("ABC", "Some other definition");
+      subject.forget("DEF", "Some other definition");
 
       assertThat(subject.getDefinitions("ABC"), equalTo(["Agile Bouncy Coyote"]));
     });
