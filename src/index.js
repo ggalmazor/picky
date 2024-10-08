@@ -12,7 +12,7 @@ const app = new bolt.App({
 });
 
 const brain = Brain.random(app.logger);
-const replies = new Replies(brain, app.client, app.logger);
+const replies = new Replies(brain, app.logger);
 const commands = new Commands(brain, app.client, app.logger);
 
 app.event("message", async ({event, context, say}) => {

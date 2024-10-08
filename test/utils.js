@@ -13,3 +13,52 @@ export const withDeterministicRandom = (block) => {
 
   return output;
 }
+
+export class TestLogger {
+  constructor() {
+    this.messages = {
+      info: [],
+      warning: [],
+      error: [],
+      debug: []
+    };
+  }
+
+  info(message) {
+    this.messages.info.push(message);
+  }
+
+  warn(message) {
+    this.messages.warn(message);
+  }
+
+  error(message) {
+    this.messages.error.push(message);
+  }
+
+  debug(message) {
+    this.messages.debug.push(message);
+  }
+}
+
+export const testSlackClient = () => new Proxy(
+    {},
+    {
+      get(proxies, name) {
+        if (proxies[name] !== undefined) return proxies[name];
+
+        proxies[name] = new Proxy(
+            {},
+            {
+              get(methods, name) {
+                methods[name] ||= () => {
+                };
+                return methods[name];
+              }
+            }
+        );
+        return proxies[name];
+      }
+    }
+);
+

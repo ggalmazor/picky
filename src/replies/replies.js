@@ -3,9 +3,8 @@ import DescribeReply from "./describe-reply.js";
 const REPLIES = [DescribeReply];
 
 export default class Replies {
-  constructor(brain, client, logger) {
+  constructor(brain, logger) {
     this.brain = brain;
-    this.client = client;
     this.logger = logger;
   }
 
@@ -14,6 +13,6 @@ export default class Replies {
     if (ReplyConstructor=== undefined)
       return;
 
-    return new ReplyConstructor(this.brain, this.client, this.logger);
+    return new ReplyConstructor(this.brain, this.logger);
   }
 }
