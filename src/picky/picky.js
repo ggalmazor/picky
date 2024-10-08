@@ -1,6 +1,6 @@
-import Brain from "../brain/brain.js";
-import Replies from "../replies/replies.js";
-import Commands from "../commands/commands.js";
+import Brain from '../brain/brain.js';
+import Replies from '../replies/replies.js';
+import Commands from '../commands/commands.js';
 
 export default class Picky {
   constructor(brain, replies, commands) {
@@ -17,20 +17,17 @@ export default class Picky {
   }
 
   async onMessage(event, context, say) {
-    if (event.text.includes(context.botUserId))
-      return;
+    if (event.text.includes(context.botUserId)) return;
 
     const reply = this.replies.get(event);
-    if (reply === undefined)
-      return;
+    if (reply === undefined) return;
 
     await reply.accept(event, say);
   }
 
   async onAppMention(event) {
     const command = this.commands.get(event);
-    if (command === undefined)
-      return;
+    if (command === undefined) return;
 
     await command.accept(event);
   }

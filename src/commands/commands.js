@@ -1,7 +1,7 @@
-import ForgetCommand from "./forget-command.js";
-import LearnCommand from "./learn-command.js";
+import ForgetCommand from './forget-command.js';
+import LearnCommand from './learn-command.js';
 
-const COMMANDS = [ForgetCommand, LearnCommand]
+const COMMANDS = [ForgetCommand, LearnCommand];
 
 export default class Commands {
   constructor(brain, client, logger) {
@@ -11,9 +11,8 @@ export default class Commands {
   }
 
   get(event) {
-    const CommandConstructor = COMMANDS.find(Command => Command.test(event));
-    if (CommandConstructor=== undefined)
-      return;
+    const CommandConstructor = COMMANDS.find((Command) => Command.test(event));
+    if (CommandConstructor === undefined) return;
 
     return new CommandConstructor(this.brain, this.client, this.logger);
   }

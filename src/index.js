@@ -1,21 +1,21 @@
-import bolt from "@slack/bolt";
-import 'dotenv/config'
-import Picky from "./picky/picky.js";
+import bolt from '@slack/bolt';
+import 'dotenv/config';
+import Picky from './picky/picky.js';
 
 const app = new bolt.App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   token: process.env.SLACK_BOT_TOKEN,
   socketMode: true,
-  appToken: process.env.SLACK_APP_TOKEN
+  appToken: process.env.SLACK_APP_TOKEN,
 });
 
 const picky = Picky.from(app);
 
-app.event("message", async ({event, context, say}) => {
+app.event('message', async ({ event, context, say }) => {
   return picky.onMessage(event, context, say);
 });
 
-app.event("app_mention", async ({event}) => {
+app.event('app_mention', async ({ event }) => {
   return picky.onAppMention(event);
 });
 

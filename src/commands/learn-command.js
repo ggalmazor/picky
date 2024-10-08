@@ -14,10 +14,10 @@ export default class LearnCommand {
   }
 
   async accept(event) {
-    this.logger.info("Replying message: " + event.text);
+    this.logger.info('Replying message: ' + event.text);
     const [, acronym, definition] = event.text.match(learnCommandMatcher());
 
     this.brain.learn(acronym, definition);
-    this.client.reactions.add({name: "white_check_mark", channel: event.channel, timestamp: event.ts});
+    this.client.reactions.add({ name: 'white_check_mark', channel: event.channel, timestamp: event.ts });
   }
 }

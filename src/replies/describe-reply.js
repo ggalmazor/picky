@@ -11,13 +11,18 @@ export default class DescribeReply {
   }
 
   async accept(event, say) {
-    this.logger.info("Replying message: " + event.text);
+    this.logger.info('Replying message: ' + event.text);
 
-    const acronyms = [...event.text.matchAll(acronymMatcher())].map(a => a[0]);
-    await Promise.all(acronyms.map(acronym => {
-      const definitions = this.brain.getDefinitions(acronym);
-      const text = definitions.length === 1 ? `${acronym} stands for: \`${definitions[0]}\`` : `${acronym} stands for:\n\`\`\`\n${definitions.join("\n")}\n\`\`\``;
-      return say(text).catch(error => this.logger.error(error));
-    }));
+    const acronyms = [...event.text.matchAll(acronymMatcher())].map((a) => a[0]);
+    await Promise.all(
+      acronyms.map((acronym) => {
+        const definitions = this.brain.getDefinitions(acronym);
+        const text =
+          definitions.length === 1
+            ? `${acronym} stands for: \`${definitions[0]}\``
+            : `${acronym} stands for:\n\`\`\`\n${definitions.join('\n')}\n\`\`\``;
+        return say(text).catch((error) => this.logger.error(error));
+      }),
+    );
   }
 }
