@@ -1,7 +1,7 @@
 import Brain from '../brain/brain.js';
 import Replies from '../replies/replies.js';
 import Commands from '../commands/commands.js';
-import RandomAcronyms from "../brain/acronyms/random-acronyms.js";
+import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 
 export default class Picky {
   constructor(brain, replies, commands) {
