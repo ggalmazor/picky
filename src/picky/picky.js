@@ -1,6 +1,7 @@
 import Brain from '../brain/brain.js';
 import Replies from '../replies/replies.js';
 import Commands from '../commands/commands.js';
+import RandomAcronyms from "../brain/acronyms/random-acronyms.js";
 
 export default class Picky {
   constructor(brain, replies, commands) {
@@ -10,7 +11,7 @@ export default class Picky {
   }
 
   static from(app) {
-    const brain = Brain.random(app.logger);
+    const brain = new Brain(new RandomAcronyms(), app.logger);
     const replies = new Replies(brain, app.logger);
     const commands = new Commands(brain, app.client, app.logger);
     return new Picky(brain, replies, commands);
