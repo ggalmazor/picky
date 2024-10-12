@@ -5,7 +5,7 @@
 (nit)Picky explains the acronyms that you use in Slack:
 - Invite Picky to a channel and it will listen to what you say
 - When someone uses an acronym, Picky will define it.
-- Picky remembers all the acronyms that has explained. However, Picky makes up random definitions, so you better make it learn the good ones!
+- Picky remembers all the acronyms that has explained. However, Picky makes up random definitions, so you better teach it the good ones!
 
 ## Commands: Learn new acronym definition
 
