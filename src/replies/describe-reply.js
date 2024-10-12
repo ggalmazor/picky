@@ -15,8 +15,8 @@ export default class DescribeReply {
 
     const acronyms = [...event.text.matchAll(acronymMatcher())].map((a) => a[0]);
     await Promise.all(
-      acronyms.map((acronym) => {
-        const definitions = this.brain.getDefinitions(acronym);
+      acronyms.map(async (acronym) => {
+        const definitions = await this.brain.getDefinitions(acronym);
         const text =
           definitions.length === 1
             ? `${acronym} stands for: \`${definitions[0]}\``

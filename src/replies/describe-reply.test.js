@@ -3,6 +3,7 @@ import { assertThat, hasItem, is } from 'hamjest';
 import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 import { TestLogger } from '../../test/utils.js';
+import VolatileMemory from '../brain/memory/volatile-memory.js';
 
 describe('DescribeReply', () => {
   describe('test', () => {
@@ -20,10 +21,13 @@ describe('DescribeReply', () => {
     let brain, logger, subject, say;
 
     beforeEach(() => {
-      brain = new Brain(new RandomAcronyms(), {
-        HTML: ['Hyper Text Markup Language'],
-        API: ['Application Programming Interface'],
-      });
+      brain = new Brain(
+        new RandomAcronyms(),
+        new VolatileMemory({
+          HTML: ['Hyper Text Markup Language'],
+          API: ['Application Programming Interface'],
+        }),
+      );
       logger = new TestLogger();
       subject = new DescribeReply(brain, logger);
       say = jest.fn().mockResolvedValue();

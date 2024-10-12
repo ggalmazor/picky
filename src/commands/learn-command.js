@@ -17,7 +17,7 @@ export default class LearnCommand {
     this.logger.info('Replying message: ' + event.text);
     const [, acronym, definition] = event.text.match(learnCommandMatcher());
 
-    this.brain.learn(acronym, definition);
+    await this.brain.learn(acronym, definition);
     this.client.reactions.add({ name: 'white_check_mark', channel: event.channel, timestamp: event.ts });
   }
 }

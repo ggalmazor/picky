@@ -166,17 +166,28 @@ const NOUNS = {
   ),
 };
 
-function randomWord(wordsMap, letter) {
-  if (letter in wordsMap) return wordsMap[letter][Math.floor(Math.random() * 20)];
-
-  return wordsMap['*'][Math.floor(Math.random() * 20)];
-}
-
 export default class RandomAcronyms {
+  constructor(random) {
+    this.random = random;
+  }
+
   define(acronym) {
-    const adjectives = Array(acronym.length - 1)
-      .fill()
-      .map((_, index) => randomWord(ADJECTIVES, acronym[index]));
-    return adjectives.concat([randomWord(NOUNS, acronym[acronym.length - 1])]).join(' ');
+    const lastIndex = acronym.length - 1;
+    return acronym
+      .split('')
+      .map((letter, index) => this.randomWord(index === lastIndex ? NOUNS : ADJECTIVES, letter))
+      .join(' ');
+  }
+
+  randomWord(wordsMap, letter) {
+    if (letter in wordsMap) {
+      const words = wordsMap[letter];
+      const totalWords = words.length;
+      return words[Math.floor(this.random() * totalWords)];
+    }
+
+    const words = wordsMap['*'];
+    const totalWords = words.length;
+    return words[Math.floor(this.random() * totalWords)];
   }
 }

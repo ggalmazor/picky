@@ -5,23 +5,19 @@ export default class Brain {
     this.logger = logger;
   }
 
-  getDefinitions(acronym) {
-    if (acronym in this.memory) return this.memory[acronym];
+  async getDefinitions(acronym) {
+    if (await this.memory.knows(acronym)) return this.memory.recall(acronym);
 
-    return (this.memory[acronym] = [this.acronyms.define(acronym)]);
+    const definition = this.acronyms.define(acronym);
+    await this.memory.learn(acronym, definition);
+    return [definition];
   }
 
-  learn(acronym, definition) {
-    this.memory[acronym] = this.memory[acronym] || [];
-    if (this.memory[acronym].includes(definition)) return;
-
-    this.memory[acronym].push(definition);
+  async learn(acronym, definition) {
+    return this.memory.learn(acronym, definition);
   }
 
-  forget(acronym, definition) {
-    if (!(acronym in this.memory)) return;
-
-    this.memory[acronym] = this.memory[acronym].filter((memorizedDefinition) => memorizedDefinition !== definition);
-    if (this.memory[acronym].length === 0) delete this.memory[acronym];
+  async forget(acronym, definition) {
+    return this.memory.forget(acronym, definition);
   }
 }

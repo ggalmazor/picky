@@ -2,6 +2,7 @@ import Brain from '../brain/brain.js';
 import Replies from '../replies/replies.js';
 import Commands from '../commands/commands.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
+import DbMemory from '../brain/memory/db-memory.js';
 
 export default class Picky {
   constructor(brain, replies, commands) {
@@ -10,8 +11,10 @@ export default class Picky {
     this.commands = commands;
   }
 
-  static from(app) {
-    const brain = new Brain(new RandomAcronyms(), app.logger);
+  static async from(db, app) {
+    const teamInfo = await app.client.team.info();
+    const memory = await DbMemory.from(db, teamInfo.team);
+    const brain = new Brain(new RandomAcronyms(Math.random), memory, app.logger);
     const replies = new Replies(brain, app.logger);
     const commands = new Commands(brain, app.client, app.logger);
     return new Picky(brain, replies, commands);

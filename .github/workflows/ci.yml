@@ -2,9 +2,25 @@ name: Node.js CI
 
 on: [push]
 
+env:
+  DATABASE_HOST: "127.0.0.1"
+  DATABASE_USER: "postgres"
+  DATABASE_PORT: 5432
+  DATABASE_PASSWORD: ""
+  DATABASE_NAME: "picky-test"
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        ports:
+          - "5432:5432"
+        env:
+          POSTGRES_USER: ${{ env.DATABASE_USER }}
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Check out the code
         uses: actions/checkout@v4
@@ -13,6 +29,7 @@ jobs:
         with:
           node-version: '20.x'
       - run: npm ci
+      - run: npm run setup-db-test
       - run: npm test
       - run: npm run linter
       - run: npm run format-check

@@ -3,6 +3,7 @@ import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 import { TestLogger, testSlackClient } from '../../test/utils.js';
 import ForgetCommand from './forget-command.js';
+import VolatileMemory from '../brain/memory/volatile-memory.js';
 
 describe('ForgetCommand', () => {
   describe('test', () => {
@@ -17,10 +18,13 @@ describe('ForgetCommand', () => {
     let brain, client, logger, subject;
 
     beforeEach(() => {
-      brain = new Brain(new RandomAcronyms(), {
-        HTML: ['Hyper Text Markup Language'],
-        API: ['Application Programming Interface'],
-      });
+      brain = new Brain(
+        new RandomAcronyms(),
+        new VolatileMemory({
+          HTML: ['Hyper Text Markup Language'],
+          API: ['Application Programming Interface'],
+        }),
+      );
       client = testSlackClient();
       logger = new TestLogger();
       subject = new ForgetCommand(brain, client, logger);
