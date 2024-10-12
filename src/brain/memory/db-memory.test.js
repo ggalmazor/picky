@@ -4,15 +4,13 @@ import { assertThat, equalTo, is } from 'hamjest';
 import knex from 'knex';
 import profiles from '../../../knexfile.js';
 
-let db;
-try {
-  db = knex(profiles.test);
-} catch (error) {
-  console.log(error);
-}
-
 describe('DbMemory.from', () => {
+  let db;
   let teamId;
+
+  beforeAll(async () => {
+    db = knex(profiles.test);
+  });
 
   beforeEach(async () => {
     await db.raw('START TRANSACTION');
@@ -21,6 +19,10 @@ describe('DbMemory.from', () => {
 
   afterEach(async () => {
     await db.raw('ROLLBACK TRANSACTION');
+  });
+
+  afterAll(async () => {
+    db.destroy();
   });
 
   describe("when there's no row in `teams` for the provided team", () => {
@@ -59,7 +61,12 @@ describe('DbMemory.from', () => {
 });
 
 describe('Database memory', () => {
+  let db;
   let teamId, subject, acronymId;
+
+  beforeAll(async () => {
+    db = knex(profiles.test);
+  });
 
   beforeEach(async () => {
     await db.raw('START TRANSACTION');
@@ -75,6 +82,10 @@ describe('Database memory', () => {
 
   afterEach(async () => {
     await db.raw('ROLLBACK TRANSACTION');
+  });
+
+  afterAll(async () => {
+    db.destroy();
   });
 
   describe('knows', () => {

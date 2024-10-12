@@ -9,7 +9,7 @@
     "setup-db-test": "node bin/setup-db.js test",
     "setup-db-production": "node bin/setup-db.js production",
     "start": "node src/index.js",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles",
     "linter": "eslint .",
     "linter-fix": "eslint --fix .",
     "format-fix": "prettier -w '*.{js,json}' '{src,tests}/**/*.js'",
