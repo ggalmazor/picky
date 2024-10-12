@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import DbMemory from './db-memory.js';
-import { assertThat, before, equalTo, is, number } from 'hamjest';
+import { assertThat, equalTo, is } from 'hamjest';
 import knex from 'knex';
 import profiles from '../../../knexfile.js';
 
