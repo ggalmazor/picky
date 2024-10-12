@@ -26,14 +26,14 @@ describe('DbMemory.from', () => {
   });
 
   describe("when there's no row in `teams` for the provided team", () => {
-    it('creates a team for the provided teamId if needed', async () => {
+    it('creates a team for the provided teamId', async () => {
       await DbMemory.from(db, { id: teamId, name: 'Test team', url: 'https://test.team.org' });
 
       const count = (await db('teams').count('id', { as: 'count' }).where({ id: teamId }))[0].count;
       assertThat(count, is('1'));
     });
 
-    it('creates a brain for the provided teamId if needed', async () => {
+    it('creates a brain for the provided teamId', async () => {
       await DbMemory.from(db, { id: teamId, name: 'Test team', url: 'https://test.team.org' });
 
       const count = (await db('teams').count('id', { as: 'count' }).where({ id: teamId }))[0].count;
