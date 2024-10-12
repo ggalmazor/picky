@@ -7,7 +7,7 @@ env:
   DATABASE_USER: "postgres"
   DATABASE_PORT: 5432
   DATABASE_PASSWORD: ""
-  DATABASE_NAME: "picky-test"
+  DATABASE_NAME: "picky"
 
 jobs:
   build:
