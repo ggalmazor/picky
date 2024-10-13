@@ -1,66 +1,29 @@
+import {v4 as uuid} from 'uuid';
 import Picky from '../src/picky/picky.js';
-import {TestLogger, testSlackClient} from "../test/utils.js";
+import {mockBootUpContext} from "../test/utils.js";
 import {assertThat, hasItem} from "hamjest";
 
+process.env.NODE_ENV = 'development';
+
 describe('Boot up script (index)', () => {
-  let app, BoltApp, knex, db, picky;
+  const {app, BoltApp, db, knex, picky} = mockBootUpContext();
 
-  beforeEach(() => {
-    app = {
-      listeners: {},
-      client: testSlackClient(),
-      logger: new TestLogger(),
-      start: jest.fn(),
-      event(event, callback) {
-        this.listeners[event] = callback
-      },
-      sendEvent(event, payload) {
-        this.listeners[event].call(null, payload);
-      }
-    };
-    BoltApp = jest.fn().mockImplementation(() => app);
-    jest.unstable_mockModule('@slack/bolt', () => ({
-      default: {
-        App: BoltApp
-      }
-    }));
+  beforeEach(async () => {
+    jest.restoreAllMocks();
+  });
 
-    db = {};
-    knex = jest.fn().mockReturnValue(db);
-    jest.unstable_mockModule('knex', () => ({
-      default: knex
-    }))
-
-    picky = {
-      onMessage: jest.fn(),
-      onAppMention: jest.fn(),
-    }
-    Picky.from = jest.fn().mockResolvedValue(picky);
-
+  it("connects to the database", async () => {
     process.env = {
       ...process.env,
-      SLACK_SIGNING_SECRET: "SLACK_SIGNING_SECRET",
-      SLACK_BOT_TOKEN: "SLACK_BOT_TOKEN",
-      ENVIRONMENT: "ENVIRONMENT",
-      SLACK_APP_TOKEN: "SLACK_APP_TOKEN",
       DATABASE_HOST: "DATABASE_HOST",
       DATABASE_PORT: "DATABASE_PORT",
       DATABASE_USER: "DATABASE_USER",
       DATABASE_PASSWORD: "DATABASE_PASSWORD",
       DATABASE_NAME: "DATABASE_NAME",
-      PORT: "PORT",
     };
-  });
 
-  afterEach(() => {
-    jest.resetModules();
-    jest.restoreAllMocks();
-  });
+    await import(`./../src/index.js?randomizer=${uuid()}`);
 
-  it("boots up the Slack app", async () => {
-    await import('./../src/index.js');
-
-    // Connects to te database
     expect(knex).toHaveBeenCalledWith({
       client: 'postgresql',
       connection: {
@@ -72,41 +35,105 @@ describe('Boot up script (index)', () => {
       },
       pool: {min: 0, max: 4}
     });
+  });
 
-    // Creates the Slack App
+  it("creates the Slack App", async () => {
+    process.env = {
+      ...process.env,
+      SLACK_SIGNING_SECRET: "SLACK_SIGNING_SECRET",
+      SLACK_BOT_TOKEN: "SLACK_BOT_TOKEN",
+      ENVIRONMENT: "ENVIRONMENT",
+      SLACK_APP_TOKEN: "SLACK_APP_TOKEN",
+    };
+
+    await import(`./../src/index.js?randomizer=${uuid()}`);
+
     expect(BoltApp).toHaveBeenCalledWith({
       signingSecret: "SLACK_SIGNING_SECRET",
       token: "SLACK_BOT_TOKEN",
       socketMode: false,
       appToken: "SLACK_APP_TOKEN",
     });
+  });
 
-    // Creates the Picky instance
+  describe("when the `ENVIRONMENT` environment variable has `development`", () => {
+    it("creates the Slack App in socket mode", async () => {
+      process.env = {
+        ...process.env,
+        SLACK_SIGNING_SECRET: "SLACK_SIGNING_SECRET",
+        SLACK_BOT_TOKEN: "SLACK_BOT_TOKEN",
+        ENVIRONMENT: "development",
+        SLACK_APP_TOKEN: "SLACK_APP_TOKEN",
+      };
+
+      await import(`./../src/index.js?randomizer=${uuid()}`);
+
+      expect(BoltApp).toHaveBeenCalledWith({
+        signingSecret: "SLACK_SIGNING_SECRET",
+        token: "SLACK_BOT_TOKEN",
+        socketMode: true,
+        appToken: "SLACK_APP_TOKEN",
+      });
+    })
+  });
+
+  it("creates the Picky instance", async () => {
+    await import(`./../src/index.js?randomizer=${uuid()}`);
+
     expect(Picky.from).toHaveBeenCalledWith(db, app);
+  });
 
-    // Routes Slack app message events to the Picky onMessage callback
-    const messagePayload = {event: {}};
-    app.sendEvent('message', messagePayload);
+  it("routes Slack app message events to the Picky onMessage callback", async () => {
+    await import(`./../src/index.js?randomizer=${uuid()}`);
 
-    expect(picky.onMessage).toHaveBeenCalledWith(messagePayload);
+    const payload = {event: {}};
+    app.sendEvent('message', payload);
 
-    // When the message is sent to the IM channel with the app
-    // Routes Slack app message events to the Picky onAppMention callback with replyAll = true
-    const imMessagePayload = {event: {channel_type: "im"}};
-    app.sendEvent('message', imMessagePayload);
+    expect(picky.onMessage).toHaveBeenCalledWith(payload);
+  });
 
-    expect(picky.onAppMention).toHaveBeenCalledWith(imMessagePayload, true);
+  describe("when a message event comes from an IM channel", () => {
+    it("routes the event to the Picky onAppMention callback providing `replyAll: true`", async () => {
+      await import(`./../src/index.js?randomizer=${uuid()}`);
 
-    // Routes Slack app mention events to the Picky onAppMention callback
-    const mentionPayload = {event: {}};
-    app.sendEvent('app_mention', messagePayload);
+      const payload = {event: {channel_type: "im"}};
+      app.sendEvent('message', payload);
 
-    expect(picky.onAppMention).toHaveBeenCalledWith(mentionPayload);
+      expect(picky.onAppMention).toHaveBeenCalledWith(payload, true);
+    });
+  });
 
-    // Starts the Slack App
+  it("routes Slack app mention events to the Picky onAppMention callback", async () => {
+    await import(`./../src/index.js?randomizer=${uuid()}`);
+
+    const payload = {event: {}};
+    app.sendEvent('app_mention', payload);
+
+    expect(picky.onAppMention).toHaveBeenCalledWith(payload);
+  });
+
+  it("starts the Slack App", async () => {
+    process.env = {
+      ...process.env,
+      PORT: "PORT"
+    };
+
+    await import(`./../src/index.js?randomizer=${uuid()}`);
+
     expect(app.start).toHaveBeenCalledWith("PORT");
+  });
 
-    // Logs an info message
+  describe("when there's no `PORT` environment variable", () => {
+    it("Starts the Slack App in the default port", async () => {
+      await import(`./../src/index.js?randomizer=${uuid()}`);
+
+      expect(app.start).toHaveBeenCalledWith(3000);
+    })
+  });
+
+  it("logs an info message", async () => {
+    await import(`./../src/index.js?randomizer=${uuid()}`);
+
     assertThat(app.logger.messages.info, hasItem("⚡️ Bolt app is running!"));
   });
 });

@@ -1,3 +1,5 @@
+import Picky from "../src/picky/picky.js";
+
 const RANDOM_NUMBERS = [
   0.43131150217673775, 0.8812124484754995, 0.7065464533465053,
   0.9275319241087914, 0.6164626797014028, 0.13430086651980955,
@@ -89,4 +91,39 @@ export const testSlackClient = () => new Proxy(
     }
   }
 );
+
+export function mockBootUpContext() {
+  const app = {
+    listeners: {},
+    client: testSlackClient(),
+    logger: new TestLogger(),
+    start: jest.fn(),
+    event(event, callback) {
+      this.listeners[event] = callback
+    },
+    sendEvent(event, payload) {
+      this.listeners[event].call(null, payload);
+    }
+  };
+  const BoltApp = jest.fn().mockImplementation(() => app);
+  jest.unstable_mockModule('@slack/bolt', () => ({
+    default: {
+      App: BoltApp
+    }
+  }));
+
+  const db = {};
+  const knex = jest.fn().mockReturnValue(db);
+  jest.unstable_mockModule('knex', () => ({
+    default: knex
+  }))
+
+  const picky = {
+    onMessage: jest.fn(),
+    onAppMention: jest.fn(),
+  }
+  Picky.from = jest.fn().mockResolvedValue(picky);
+
+  return {app, BoltApp, db, knex, picky};
+}
 
