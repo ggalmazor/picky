@@ -92,7 +92,7 @@ describe('Picky', () => {
     commands = new Commands([], brain, client, logger);
     say = jest.fn().mockResolvedValue();
     payload = buildPayload('foo bar baz');
-    subject = new Picky(brain, replies, commands, logger);
+    subject = new Picky(brain, replies, commands, client, logger);
   });
 
   describe('onMessage', () => {

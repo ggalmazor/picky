@@ -34,5 +34,9 @@ app.event('app_mention', async (payload) => {
   return picky.onAppMention(payload);
 });
 
+app.event('app_home_opened', async (payload) => {
+  return picky.onAppHomeOpened(payload);
+});
+
 await app.start(process.env.PORT || 3000);
 app.logger.info('⚡️ Bolt app is running!');
