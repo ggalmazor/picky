@@ -1,6 +1,6 @@
 import ForgetCommand from './forget-command.js';
 import LearnCommand from './learn-command.js';
-import DefineCommand from "./define-command.js";
+import DefineCommand from './define-command.js';
 
 const COMMANDS = [ForgetCommand, LearnCommand, DefineCommand];
 

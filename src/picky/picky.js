@@ -22,39 +22,39 @@ export default class Picky {
   }
 
   async onMessage(payload, replyAll = false) {
-    const {event, context, say} = payload;
+    const { event, context, say } = payload;
     const reply = this.replies.get(event);
 
     if (reply === undefined && replyAll)
       return say(`I don't know how to reply to: \`${event.text}\``).catch((error) => this.logger.error(error));
 
     if (event.text.includes(context.botUserId)) {
-      this.logger.debug(`Ignoring message with mention: ${event.text}`)
+      this.logger.debug(`Ignoring message with mention: ${event.text}`);
       return;
     }
 
-    if(reply === undefined) {
-      this.logger.debug(`No reply for: ${event.text}`)
+    if (reply === undefined) {
+      this.logger.debug(`No reply for: ${event.text}`);
       return;
     }
 
-    this.logger.info(`Replying to message: ${event.text}`)
+    this.logger.info(`Replying to message: ${event.text}`);
     await reply.accept(event, say);
   }
 
   async onAppMention(payload, replyAll = false) {
-    const {event, say} = payload;
+    const { event, say } = payload;
     const command = this.commands.get(event);
 
     if (command === undefined && replyAll)
       return say(`I don't know how to reply to: \`${event.text}\``).catch((error) => this.logger.error(error));
 
     if (command === undefined) {
-      this.logger.debug(`No command for: ${event.text}`)
+      this.logger.debug(`No command for: ${event.text}`);
       return;
     }
 
-    this.logger.info(`Replying to mention: ${event.text}`)
+    this.logger.info(`Replying to mention: ${event.text}`);
     await command.accept(event, say);
   }
 }

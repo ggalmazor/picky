@@ -2,7 +2,7 @@ import DefineCommand from './define-command.js';
 import { assertThat, hasItem, is } from 'hamjest';
 import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
-import {TestLogger, testSlackClient} from '../../test/utils.js';
+import { TestLogger, testSlackClient } from '../../test/utils.js';
 import VolatileMemory from '../brain/memory/volatile-memory.js';
 
 describe('DefineCommand', () => {

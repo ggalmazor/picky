@@ -1,8 +1,8 @@
-import {assertThat, hasProperties, instanceOf, is} from 'hamjest';
+import { assertThat, hasProperties, instanceOf, is } from 'hamjest';
 import Commands from './commands.js';
 import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
-import {TestLogger, testSlackClient} from '../../test/utils.js';
+import { TestLogger, testSlackClient } from '../../test/utils.js';
 
 class TestCommand {
   constructor(brain, client, logger) {
@@ -17,7 +17,7 @@ class TestCommand {
 }
 
 function buildEvent() {
-  return {text: 'foo bar baz'};
+  return { text: 'foo bar baz' };
 }
 
 describe('Commands', () => {
@@ -34,7 +34,7 @@ describe('Commands', () => {
   });
 
   describe('get', () => {
-    describe("when a Command matches the provided event", () => {
+    describe('when a Command matches the provided event', () => {
       beforeEach(() => {
         subject.add(TestCommand);
       });
@@ -44,11 +44,11 @@ describe('Commands', () => {
       });
 
       it('passes through the brain, client, and logger instances', () => {
-        assertThat(subject.get(buildEvent()), hasProperties({brain, client, logger}));
+        assertThat(subject.get(buildEvent()), hasProperties({ brain, client, logger }));
       });
     });
 
-    describe("when no Command matches the provided event", () => {
+    describe('when no Command matches the provided event', () => {
       it('returns `undefined`', () => {
         assertThat(subject.get(buildEvent()), is(undefined));
       });

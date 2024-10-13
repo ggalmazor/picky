@@ -1,8 +1,8 @@
-import {assertThat, hasProperties, instanceOf, is} from 'hamjest';
+import { assertThat, hasProperties, instanceOf, is } from 'hamjest';
 import Replies from './replies.js';
 import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
-import {TestLogger} from '../../test/utils.js';
+import { TestLogger } from '../../test/utils.js';
 
 class TestReply {
   constructor(brain, logger) {
@@ -16,7 +16,7 @@ class TestReply {
 }
 
 function buildEvent() {
-  return {text: 'foo bar baz'};
+  return { text: 'foo bar baz' };
 }
 
 describe('Replies', () => {
@@ -32,7 +32,7 @@ describe('Replies', () => {
   });
 
   describe('get', () => {
-    describe("when a Reply matches the provided event", () => {
+    describe('when a Reply matches the provided event', () => {
       beforeEach(() => {
         subject.add(TestReply);
       });
@@ -42,11 +42,11 @@ describe('Replies', () => {
       });
 
       it('passes through the brain and logger instances', () => {
-        assertThat(subject.get(buildEvent()), hasProperties({brain, logger}));
+        assertThat(subject.get(buildEvent()), hasProperties({ brain, logger }));
       });
     });
 
-    describe("when no Reply matches the provided event", () => {
+    describe('when no Reply matches the provided event', () => {
       it('returns `undefined`', () => {
         assertThat(subject.get(buildEvent()), is(undefined));
       });

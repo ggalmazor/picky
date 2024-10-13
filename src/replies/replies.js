@@ -10,7 +10,7 @@ export default class Replies {
   }
 
   static load(brain, logger) {
-    return new Replies(REPLIES, brain, logger)
+    return new Replies(REPLIES, brain, logger);
   }
 
   add(reply) {
