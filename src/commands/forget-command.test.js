@@ -30,12 +30,6 @@ describe('ForgetCommand', () => {
       subject = new ForgetCommand(brain, client, logger);
     });
 
-    it('logs an info message', async () => {
-      await subject.accept({ text: 'forget API Application Programming Interface', channel: 'C07QK0MHHKM' });
-
-      assertThat(logger.messages.info, hasItem('Replying message: forget API Application Programming Interface'));
-    });
-
     it('uses the brain to forget the provided acronym definition', async () => {
       const spy = jest.spyOn(brain, 'forget');
 

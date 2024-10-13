@@ -30,12 +30,6 @@ describe('LearnCommand', () => {
       subject = new LearnCommand(brain, client, logger);
     });
 
-    it('logs an info message', async () => {
-      await subject.accept({ text: 'learn API Application Programming Interface', channel: 'C07QK0MHHKM' });
-
-      assertThat(logger.messages.info, hasItem('Replying message: learn API Application Programming Interface'));
-    });
-
     it('uses the brain to learn the provided acronym definition', async () => {
       const spy = jest.spyOn(brain, 'learn');
 

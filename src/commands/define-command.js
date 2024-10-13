@@ -14,7 +14,6 @@ export default class DefineCommand {
   }
 
   async accept(event, say) {
-    this.logger.info('Replying message: ' + event.text);
     const [, acronym] = event.text.match(defineCommandMatcher());
 
     const definitions = await this.brain.getDefinitions(acronym);

@@ -12,7 +12,6 @@ export default class ForgetCommand {
   }
 
   async accept(event) {
-    this.logger.info('Replying message: ' + event.text);
     const [, acronym, definition] = event.text.match(forgetCommandMatcher());
 
     this.brain.forget(acronym, definition);

@@ -33,12 +33,6 @@ describe('DefineCommand', () => {
       say = jest.fn().mockResolvedValue();
     });
 
-    it('logs an info message', async () => {
-      await subject.accept({ text: '@Picky define API' }, say);
-
-      assertThat(logger.messages.info, hasItem('Replying message: @Picky define API'));
-    });
-
     it('uses the brain to get acronym definitions', async () => {
       const spy = jest.spyOn(brain, 'getDefinitions');
 

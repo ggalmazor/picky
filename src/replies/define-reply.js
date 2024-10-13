@@ -11,8 +11,6 @@ export default class DefineReply {
   }
 
   async accept(event, say) {
-    this.logger.info('Replying message: ' + event.text);
-
     const acronyms = [...event.text.matchAll(acronymMatcher())].map((a) => a[0]);
     await Promise.all(
       acronyms.map(async (acronym) => {

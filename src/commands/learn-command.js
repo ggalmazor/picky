@@ -14,7 +14,6 @@ export default class LearnCommand {
   }
 
   async accept(event) {
-    this.logger.info('Replying message: ' + event.text);
     const [, acronym, definition] = event.text.match(learnCommandMatcher());
 
     await this.brain.learn(acronym, definition);

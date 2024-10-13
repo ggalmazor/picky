@@ -33,12 +33,6 @@ describe('DefineReply', () => {
       say = jest.fn().mockResolvedValue();
     });
 
-    it('logs an info message', async () => {
-      await subject.accept({ text: 'HTML' }, say);
-
-      assertThat(logger.messages.info, hasItem('Replying message: HTML'));
-    });
-
     it('uses the brain to get acronym definitions', async () => {
       const spy = jest.spyOn(brain, 'getDefinitions');
 
