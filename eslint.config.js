@@ -12,7 +12,7 @@ export default [
   pluginJs.configs.recommended,
   eslintConfigPrettier,
   {
-    files: ['**/*.test.js'],
+    files: ['**/*.test.js', 'test/*.js'],
     ...jest.configs['flat/recommended'],
     rules: {
       ...jest.configs['flat/recommended'].rules,

@@ -1,5 +1,5 @@
 import DefineReply from './define-reply.js';
-import { assertThat, hasItem, is } from 'hamjest';
+import { assertThat, is } from 'hamjest';
 import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 import { TestLogger } from '../../test/utils.js';

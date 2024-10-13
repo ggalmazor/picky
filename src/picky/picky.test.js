@@ -5,7 +5,7 @@ import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 import Replies from '../replies/replies.js';
 import Commands from '../commands/commands.js';
 import VolatileMemory from '../brain/memory/volatile-memory.js';
-import { allOf, assertThat, empty, equalTo, hasItem, instanceOf, is, not } from 'hamjest';
+import { allOf, assertThat, empty, hasItem, instanceOf, is, not } from 'hamjest';
 import { v4 as uuid } from 'uuid';
 import knex from 'knex';
 import profiles from '../../knexfile.js';
