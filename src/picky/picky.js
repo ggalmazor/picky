@@ -77,12 +77,11 @@ export default class Picky {
       ]
     };
 
-    const response = await this.client.views.publish({
+    await this.client.views.publish({
       user_id: payload.context.userId,
       view: JSON.stringify(view)
     }).catch(error => {
       this.logger.error(error);
     });
-    console.log(response);
   }
 }
