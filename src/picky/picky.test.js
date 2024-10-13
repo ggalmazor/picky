@@ -1,84 +1,233 @@
-import { TestLogger } from '../../test/utils.js';
+import {TestLogger, testSlackClient} from '../../test/utils.js';
 import Picky from './picky.js';
 import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 import Replies from '../replies/replies.js';
 import Commands from '../commands/commands.js';
 import VolatileMemory from '../brain/memory/volatile-memory.js';
-import {assertThat, hasItem} from "hamjest";
+import {allOf, assertThat, empty, equalTo, hasItem, instanceOf, is, not} from "hamjest";
+import {v4 as uuid} from "uuid";
+import knex from 'knex';
+import profiles from '../../knexfile.js';
+import DbMemory from "../brain/memory/db-memory.js";
+
+function buildReplyOrCommandSpy(testResult) {
+  const acceptSpy = jest.fn();
+
+  function Constructor() {
+  }
+
+  Constructor.test = () => testResult;
+  Constructor.prototype.accept = acceptSpy;
+
+  return [Constructor, acceptSpy];
+}
+
+describe('Picky.from(...) factory', () => {
+  let db, teamId, app;
+
+  beforeAll(async () => {
+    db = knex(profiles.test);
+  });
+
+  beforeEach(async () => {
+    await db.raw('START TRANSACTION');
+    teamId = uuid();
+
+    app = {client: testSlackClient(), logger: new TestLogger()};
+    app.client.team.info = jest.fn().mockResolvedValue({
+      team: {
+        id: teamId,
+        name: "Test team",
+        url: "https://test.team.org"
+      }
+    })
+  });
+
+  afterEach(async () => {
+    await db.raw('ROLLBACK TRANSACTION');
+  });
+
+  afterAll(async () => {
+    db.destroy();
+  });
+
+  it("gets the team's info using the app's client", async () => {
+    await Picky.from(db, app);
+
+    expect(app.client.team.info).toHaveBeenCalled();
+  });
+
+  it("configures the dependencies tree and returns a new Picky instance", async () => {
+    const subject = await Picky.from(db, app);
+
+    assertThat(subject, is(instanceOf(Picky)));
+    assertThat(subject.brain, is(instanceOf(Brain)));
+    assertThat(subject.brain.memory, is(instanceOf(DbMemory)));
+    assertThat(subject.commands, is(instanceOf(Commands)));
+    assertThat(subject.commands.commands, is(not(empty())));
+    assertThat(subject.replies, is(instanceOf(Replies)));
+    assertThat(subject.replies.replies, is(not(empty())));
+    assertThat(subject.logger, is(app.logger));
+  });
+});
 
 describe('Picky', () => {
-  let brain, logger, replies, commands, say, picky;
+  let brain, client, logger, replies, commands, say, subject, payload;
+
+  function buildPayload(text = 'foo bar baz', botUserId = 'U07QZFMN8MU') {
+    return {event: {text}, context: {botUserId}, say};
+  }
 
   beforeEach(() => {
     brain = new Brain(
-      new RandomAcronyms(),
+      new RandomAcronyms(Math.random),
       new VolatileMemory({
         HTML: ['Hyper Text Markup Language'],
         API: ['Application Programming Interface'],
       }),
     );
     logger = new TestLogger();
-    replies = new Replies(brain, logger);
-    commands = new Commands(brain, logger);
+    client = testSlackClient();
+    replies = new Replies([], brain, logger);
+    commands = new Commands([], brain, client, logger);
     say = jest.fn().mockResolvedValue();
-    picky = new Picky(brain, replies, commands, logger);
+    payload = buildPayload('foo bar baz');
+    subject = new Picky(brain, replies, commands, logger);
   });
 
   describe('onMessage', () => {
-    it('logs an info message', async () => {
-      await picky.onMessage({ text: 'HTML' }, { botUserId: 'Picky' }, say);
+    describe("when there's a Reply for the message", () => {
+      let Reply, replySpy;
 
-      assertThat(logger.messages.info, hasItem('Replying message: HTML'));
+      beforeEach(() => {
+        [Reply, replySpy] = buildReplyOrCommandSpy(true);
+        replies.add(Reply)
+      });
+
+      it('logs an info message', async () => {
+        await subject.onMessage(payload);
+
+        assertThat(logger.messages.info, hasItem(`Replying to message: ${payload.event.text}`));
+      });
+
+      it('executes the Reply', async () => {
+        await subject.onMessage(payload);
+
+        expect(replySpy).toHaveBeenCalledWith({text: payload.event.text}, say);
+      });
+
+      describe("when the message includes a mention to Picky", () => {
+        beforeEach(() => {
+          payload = buildPayload('<BOTUSERID> foo bar baz', 'BOTUSERID');
+        });
+
+        it("logs a debug message", async () => {
+          await subject.onMessage(payload);
+
+          assertThat(logger.messages.debug, hasItem(`Ignoring message with mention: ${payload.event.text}`));
+        });
+
+        it("doesn't execute the Reply", async () => {
+          await subject.onMessage(payload);
+
+          expect(replySpy).not.toHaveBeenCalled();
+        });
+      });
     });
 
-    it("logs a debug message if there's no Reply for the message", async () => {
-      await picky.onMessage({ text: 'foo bar baz' }, { botUserId: 'Picky' }, say);
+    describe("when there's no Reply for the message", () => {
+      it('logs a debug message', async () => {
+        await subject.onMessage(payload);
 
-      assertThat(logger.messages.debug, hasItem('No reply for: foo bar baz'));
-    });
+        assertThat(logger.messages.debug, hasItem(`No reply for: ${payload.event.text}`));
+      });
 
-    it('replies to supported messages', async () => {
-      await picky.onMessage({ text: 'HTML' }, { botUserId: 'Picky' }, say);
+      it("doesn't send any reply message", async () => {
+        await subject.onMessage(payload);
 
-      expect(say).toHaveBeenCalledWith('HTML stands for: `Hyper Text Markup Language`');
-    });
+        expect(say).not.toHaveBeenCalled();
+      });
 
-    it('ignores unsupported messages', async () => {
-      await picky.onMessage({ text: 'Some unsupported message' }, { botUserId: 'Picky' }, say);
+      describe("when `true` is provided in the `replyAll` param", () => {
+        it("doesn't log a debug message", async () => {
+          await subject.onMessage(payload, true);
 
-      expect(say).not.toHaveBeenCalled();
-    });
+          assertThat(logger.messages.debug, not(hasItem(`No reply for: ${payload.event.text}`)));
+        });
 
-    it('ignores app mentions', async () => {
-      await picky.onMessage({ text: '@Picky HTML' }, { botUserId: 'Picky' }, say);
+        it("replies informing that it doesn't know how to reply to the message", async () => {
+          await subject.onMessage(payload, true);
 
-      expect(say).not.toHaveBeenCalled();
+          expect(say).toHaveBeenCalledWith(`I don't know how to reply to: \`${payload.event.text}\``);
+        });
+      });
+
+      describe("when the message includes a mention to Picky", () => {
+        beforeEach(() => {
+          payload = buildPayload('<BOTUSERID> foo bar baz', 'BOTUSERID');
+        });
+
+        it("logs a different debug message", async () => {
+          await subject.onMessage(payload);
+
+          assertThat(logger.messages.debug, allOf(
+            not(hasItem(`No reply for: ${payload.event.text}`)),
+            hasItem(`Ignoring message with mention: ${payload.event.text}`)
+          ));
+        });
+      });
     });
   });
 
   describe('onAppMention', () => {
-    it('logs an info message', async () => {
-      commands.get = () => ({ accept: () => {} });
+    describe("when there's a Command for the message", () => {
+      let Command, commandSpy;
 
-      await picky.onAppMention({ text: 'define HTML' }, say);
+      beforeEach(() => {
+        [Command, commandSpy] = buildReplyOrCommandSpy(true);
+        commands.add(Command)
+      });
 
-      assertThat(logger.messages.info, hasItem('Replying to mention: define HTML'));
+      it('logs an info message', async () => {
+        await subject.onAppMention(payload);
+
+        assertThat(logger.messages.info, hasItem(`Replying to mention: ${payload.event.text}`));
+      });
+
+      it('executes the Reply', async () => {
+        await subject.onAppMention(payload);
+
+        expect(commandSpy).toHaveBeenCalledWith({text: payload.event.text}, say);
+      });
     });
 
-    it("logs a debug message if there's no Reply for the message", async () => {
-      await picky.onAppMention({ text: 'foo bar baz' }, say);
+    describe("when there's no Command for the message", () => {
+      it('logs a debug message', async () => {
+        await subject.onAppMention(payload);
 
-      assertThat(logger.messages.debug, hasItem('No command for: foo bar baz'));
-    });
+        assertThat(logger.messages.debug, hasItem(`No command for: ${payload.event.text}`));
+      });
 
-    it('executes supported commands', async () => {
-      const commandSpy = jest.fn();
-      commands.get = () => ({ accept: commandSpy });
+      it("doesn't send any reply message", async () => {
+        await subject.onAppMention(payload);
 
-      await picky.onAppMention({ text: 'define HTML' }, say);
+        expect(say).not.toHaveBeenCalled();
+      });
 
-      expect(commandSpy).toHaveBeenCalledWith({ text: 'define HTML' }, say);
-    });
+      describe("when `true` is provided in the `replyAll` param", () => {
+        it("doesn't log a debug message", async () => {
+          await subject.onAppMention(payload, true);
+
+          assertThat(logger.messages.debug, not(hasItem(`No command for: ${payload.event.text}`)));
+        });
+
+        it("replies informing that it doesn't know how to reply to the message", async () => {
+          await subject.onAppMention(payload, true);
+
+          expect(say).toHaveBeenCalledWith(`I don't know how to reply to: \`${payload.event.text}\``);
+        });
+      })
+    })
   });
 });

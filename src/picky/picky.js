@@ -16,16 +16,24 @@ export default class Picky {
     const teamInfo = await app.client.team.info();
     const memory = await DbMemory.from(db, teamInfo.team);
     const brain = new Brain(new RandomAcronyms(Math.random), memory, app.logger);
-    const replies = new Replies(brain, app.logger);
-    const commands = new Commands(brain, app.client, app.logger);
+    const replies = Replies.load(brain, app.logger);
+    const commands = Commands.load(brain, app.client, app.logger);
     return new Picky(brain, replies, commands, app.logger);
   }
 
-  async onMessage(event, context, say) {
-    if (event.text.includes(context.botUserId)) return;
-
+  async onMessage(payload, replyAll = false) {
+    const {event, context, say} = payload;
     const reply = this.replies.get(event);
-    if (reply === undefined) {
+
+    if (reply === undefined && replyAll)
+      return say(`I don't know how to reply to: \`${event.text}\``).catch((error) => this.logger.error(error));
+
+    if (event.text.includes(context.botUserId)) {
+      this.logger.debug(`Ignoring message with mention: ${event.text}`)
+      return;
+    }
+
+    if(reply === undefined) {
       this.logger.debug(`No reply for: ${event.text}`)
       return;
     }
@@ -34,8 +42,13 @@ export default class Picky {
     await reply.accept(event, say);
   }
 
-  async onAppMention(event, say) {
+  async onAppMention(payload, replyAll = false) {
+    const {event, say} = payload;
     const command = this.commands.get(event);
+
+    if (command === undefined && replyAll)
+      return say(`I don't know how to reply to: \`${event.text}\``).catch((error) => this.logger.error(error));
+
     if (command === undefined) {
       this.logger.debug(`No command for: ${event.text}`)
       return;

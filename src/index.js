@@ -12,10 +12,7 @@ const db = knex({
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
   },
-  pool: { min: 0, max: 4 },
-  migrations: {
-    tableName: 'migrations',
-  },
+  pool: { min: 0, max: 4 }
 });
 
 const app = new bolt.App({
@@ -27,9 +24,16 @@ const app = new bolt.App({
 
 const picky = await Picky.from(db, app);
 
-app.event('message', async ({ event, context, say }) => picky.onMessage(event, context, say));
+app.event('message', async (payload) => {
+  if (payload.event.channel_type === "im")
+    return picky.onAppMention(payload, true);
 
-app.event('app_mention', async ({ event , say}) => picky.onAppMention(event, say));
+  return picky.onMessage(payload);
+});
+
+app.event('app_mention', async (payload) => {
+  return picky.onAppMention(payload);
+});
 
 await app.start(process.env.PORT || 3000);
-console.log('⚡️ Bolt app is running!');
+app.logger.info('⚡️ Bolt app is running!');

@@ -1,10 +1,24 @@
-import { assertThat, hasProperties, instanceOf, is } from 'hamjest';
+import {assertThat, hasProperties, instanceOf, is} from 'hamjest';
 import Commands from './commands.js';
 import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
-import { TestLogger, testSlackClient } from '../../test/utils.js';
-import ForgetCommand from './forget-command.js';
-import LearnCommand from './learn-command.js';
+import {TestLogger, testSlackClient} from '../../test/utils.js';
+
+class TestCommand {
+  constructor(brain, client, logger) {
+    this.logger = logger;
+    this.client = client;
+    this.brain = brain;
+  }
+
+  static test() {
+    return true;
+  }
+}
+
+function buildEvent() {
+  return {text: 'foo bar baz'};
+}
 
 describe('Commands', () => {
   let brain, client, logger, subject;
@@ -16,28 +30,28 @@ describe('Commands', () => {
     });
     client = testSlackClient();
     logger = new TestLogger();
-    subject = new Commands(brain, client, logger);
+    subject = new Commands([], brain, client, logger);
   });
 
   describe('get', () => {
-    it('returns the Command instance that matches the provided event', () => {
-      assertThat(subject.get({ text: 'forget API Application Programming Interface' }), is(instanceOf(ForgetCommand)));
-      assertThat(subject.get({ text: 'learn API Application Programming Interface' }), is(instanceOf(LearnCommand)));
+    describe("when a Command matches the provided event", () => {
+      beforeEach(() => {
+        subject.add(TestCommand);
+      });
+
+      it('returns the Command instance that matches the provided event', () => {
+        assertThat(subject.get(buildEvent()), is(instanceOf(TestCommand)));
+      });
+
+      it('passes through the brain, client, and logger instances', () => {
+        assertThat(subject.get(buildEvent()), hasProperties({brain, client, logger}));
+      });
     });
 
-    it('returns `undefined` if no Command matches the provided event', () => {
-      assertThat(subject.get({ text: "Doesn't match any command" }), is(undefined));
-    });
-
-    it('passes through the client and logger instances', () => {
-      assertThat(
-        subject.get({ text: 'forget API Application Programming Interface' }),
-        hasProperties({
-          brain,
-          client,
-          logger,
-        }),
-      );
+    describe("when no Command matches the provided event", () => {
+      it('returns `undefined`', () => {
+        assertThat(subject.get(buildEvent()), is(undefined));
+      });
     });
   });
 });

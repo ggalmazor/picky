@@ -1,9 +1,23 @@
-import DefineReply from './define-reply.js';
-import { assertThat, hasProperties, instanceOf, is } from 'hamjest';
+import {assertThat, hasProperties, instanceOf, is} from 'hamjest';
 import Replies from './replies.js';
 import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
-import { TestLogger } from '../../test/utils.js';
+import {TestLogger} from '../../test/utils.js';
+
+class TestReply {
+  constructor(brain, logger) {
+    this.logger = logger;
+    this.brain = brain;
+  }
+
+  static test() {
+    return true;
+  }
+}
+
+function buildEvent() {
+  return {text: 'foo bar baz'};
+}
 
 describe('Replies', () => {
   let brain, logger, subject;
@@ -14,26 +28,28 @@ describe('Replies', () => {
       API: ['Application Programming Interface'],
     });
     logger = new TestLogger();
-    subject = new Replies(brain, logger);
+    subject = new Replies([], brain, logger);
   });
 
   describe('get', () => {
-    it('returns the Reply instance that matches the provided event', () => {
-      const reply = subject.get({ text: 'FOO' });
+    describe("when a Reply matches the provided event", () => {
+      beforeEach(() => {
+        subject.add(TestReply);
+      });
 
-      assertThat(reply, is(instanceOf(DefineReply)));
+      it('returns the Reply instance that matches the provided event', () => {
+        assertThat(subject.get(buildEvent()), is(instanceOf(TestReply)));
+      });
+
+      it('passes through the brain and logger instances', () => {
+        assertThat(subject.get(buildEvent()), hasProperties({brain, logger}));
+      });
     });
 
-    it('returns `undefined` if no Reply matches the provided event', () => {
-      const reply = subject.get({ text: "Doesn't match any reply" });
-
-      assertThat(reply, is(undefined));
-    });
-
-    it('passes through the client and logger instances', () => {
-      const reply = subject.get({ text: 'FOO' });
-
-      assertThat(reply, hasProperties({ brain, logger }));
+    describe("when no Reply matches the provided event", () => {
+      it('returns `undefined`', () => {
+        assertThat(subject.get(buildEvent()), is(undefined));
+      });
     });
   });
 });
