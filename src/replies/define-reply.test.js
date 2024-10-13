@@ -1,19 +1,19 @@
-import DescribeReply from './describe-reply.js';
+import DefineReply from './define-reply.js';
 import { assertThat, hasItem, is } from 'hamjest';
 import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 import { TestLogger } from '../../test/utils.js';
 import VolatileMemory from '../brain/memory/volatile-memory.js';
 
-describe('DescribeReply', () => {
+describe('DefineReply', () => {
   describe('test', () => {
     it('returns true if the provided text matches the expected pattern for this Reply', () => {
-      assertThat(DescribeReply.test({ text: 'Has a single acronym: FOO' }), is(true));
-      assertThat(DescribeReply.test({ text: 'Has multiple acronyms: FOO BAR' }), is(true));
-      assertThat(DescribeReply.test({ text: 'FOO Acronyms can be BAR in any position BAZ' }), is(true));
-      assertThat(DescribeReply.test({ text: 'No acronyms' }), is(false));
-      assertThat(DescribeReply.test({ text: 'Acronyms have at least 2 letters: A' }), is(false));
-      assertThat(DescribeReply.test({ text: 'Acronyms have at most 5 letters: ABCDEF' }), is(false));
+      assertThat(DefineReply.test({ text: 'Has a single acronym: FOO' }), is(true));
+      assertThat(DefineReply.test({ text: 'Has multiple acronyms: FOO BAR' }), is(true));
+      assertThat(DefineReply.test({ text: 'FOO Acronyms can be BAR in any position BAZ' }), is(true));
+      assertThat(DefineReply.test({ text: 'No acronyms' }), is(false));
+      assertThat(DefineReply.test({ text: 'Acronyms have at least 2 letters: A' }), is(false));
+      assertThat(DefineReply.test({ text: 'Acronyms have at most 5 letters: ABCDEF' }), is(false));
     });
   });
 
@@ -29,7 +29,7 @@ describe('DescribeReply', () => {
         }),
       );
       logger = new TestLogger();
-      subject = new DescribeReply(brain, logger);
+      subject = new DefineReply(brain, logger);
       say = jest.fn().mockResolvedValue();
     });
 

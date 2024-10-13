@@ -1,6 +1,6 @@
 const acronymMatcher = () => /\b([A-Z]{2,5})\b/g;
 
-export default class DescribeReply {
+export default class DefineReply {
   constructor(brain, logger) {
     this.brain = brain;
     this.logger = logger;

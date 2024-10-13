@@ -29,7 +29,7 @@ const picky = await Picky.from(db, app);
 
 app.event('message', async ({ event, context, say }) => picky.onMessage(event, context, say));
 
-app.event('app_mention', async ({ event }) => picky.onAppMention(event));
+app.event('app_mention', async ({ event , say}) => picky.onAppMention(event, say));
 
 await app.start(process.env.PORT || 3000);
 console.log('⚡️ Bolt app is running!');

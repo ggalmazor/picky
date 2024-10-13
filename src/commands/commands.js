@@ -1,7 +1,8 @@
 import ForgetCommand from './forget-command.js';
 import LearnCommand from './learn-command.js';
+import DefineCommand from "./define-command.js";
 
-const COMMANDS = [ForgetCommand, LearnCommand];
+const COMMANDS = [ForgetCommand, LearnCommand, DefineCommand];
 
 export default class Commands {
   constructor(brain, client, logger) {

@@ -29,10 +29,10 @@ export default class Picky {
     await reply.accept(event, say);
   }
 
-  async onAppMention(event) {
+  async onAppMention(event, say) {
     const command = this.commands.get(event);
     if (command === undefined) return;
 
-    await command.accept(event);
+    await command.accept(event, say);
   }
 }

@@ -1,6 +1,6 @@
-import DescribeReply from './describe-reply.js';
+import DefineReply from './define-reply.js';
 
-const REPLIES = [DescribeReply];
+const REPLIES = [DefineReply];
 
 export default class Replies {
   constructor(brain, logger) {

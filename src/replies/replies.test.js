@@ -1,4 +1,4 @@
-import DescribeReply from './describe-reply.js';
+import DefineReply from './define-reply.js';
 import { assertThat, hasProperties, instanceOf, is } from 'hamjest';
 import Replies from './replies.js';
 import Brain from '../brain/brain.js';
@@ -21,7 +21,7 @@ describe('Replies', () => {
     it('returns the Reply instance that matches the provided event', () => {
       const reply = subject.get({ text: 'FOO' });
 
-      assertThat(reply, is(instanceOf(DescribeReply)));
+      assertThat(reply, is(instanceOf(DefineReply)));
     });
 
     it('returns `undefined` if no Reply matches the provided event', () => {
