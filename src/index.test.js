@@ -3,8 +3,6 @@ import Picky from '../src/picky/picky.js';
 import { mockBootUpContext } from '../test/utils.js';
 import { assertThat, hasItem } from 'hamjest';
 
-process.env.NODE_ENV = 'development';
-
 describe('Boot up script (index)', () => {
   const { app, BoltApp, db, knex, picky } = mockBootUpContext();
 
