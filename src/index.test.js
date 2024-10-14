@@ -40,8 +40,8 @@ describe('Boot up script (index)', () => {
       ...process.env,
       SLACK_SIGNING_SECRET: 'SLACK_SIGNING_SECRET',
       SLACK_BOT_TOKEN: 'SLACK_BOT_TOKEN',
-      ENVIRONMENT: 'ENVIRONMENT',
       SLACK_APP_TOKEN: 'SLACK_APP_TOKEN',
+      SLACK_APP_MODE: 'https',
     };
 
     await import(`./../src/index.js?randomizer=${uuid()}`);
@@ -54,14 +54,14 @@ describe('Boot up script (index)', () => {
     });
   });
 
-  describe('when the `ENVIRONMENT` environment variable has `development`', () => {
+  describe('when the `SLACK_APP_MODE` environment variable has `socket`', () => {
     it('creates the Slack App in socket mode', async () => {
       process.env = {
         ...process.env,
         SLACK_SIGNING_SECRET: 'SLACK_SIGNING_SECRET',
         SLACK_BOT_TOKEN: 'SLACK_BOT_TOKEN',
-        ENVIRONMENT: 'development',
         SLACK_APP_TOKEN: 'SLACK_APP_TOKEN',
+        SLACK_APP_MODE: 'socket',
       };
 
       await import(`./../src/index.js?randomizer=${uuid()}`);

@@ -18,7 +18,7 @@ const db = knex({
 const app = new bolt.App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   token: process.env.SLACK_BOT_TOKEN,
-  socketMode: process.env.ENVIRONMENT === 'development',
+  socketMode: process.env.SLACK_APP_MODE === 'socket',
   appToken: process.env.SLACK_APP_TOKEN,
 });
 
