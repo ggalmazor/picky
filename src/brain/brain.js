@@ -5,6 +5,10 @@ export default class Brain {
     this.logger = logger;
   }
 
+  async setUpTeam(accessToken, team, enterprise) {
+    await this.memory.setUpTeam(accessToken, team, enterprise);
+  }
+
   async getDefinitions(acronym) {
     if (await this.memory.knows(acronym)) return this.memory.recall(acronym);
 

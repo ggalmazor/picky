@@ -1,23 +1,27 @@
 export async function up(knex) {
-  await knex.schema.createTable('teams', function (table) {
-    table.string('id').primary();
+  await knex.schema.createTable('enterprises', function (table) {
+    table.uuid('id').primary().defaultTo(knex.fn.uuid());
+    table.string('slack_id').unique();
     table.string('name').notNullable();
-    table.string('url').notNullable();
     table.timestamps();
   });
 
-  await knex.schema.createTable('brains', function (table) {
+  await knex.schema.createTable('teams', function (table) {
     table.uuid('id').primary().defaultTo(knex.fn.uuid());
-    table.string('team_id').references("teams.id").notNullable().onDelete('CASCADE');
+    table.uuid('enterprise_id').references("enterprises.id").nullable().onDelete('CASCADE');
+    table.string('slack_id').notNullable();
+    table.string('name').notNullable();
+    table.string('access_token').nullable();
     table.timestamps();
+    table.unique(['enterprise_id', 'slack_id'])
   });
 
   await knex.schema.createTable('acronyms', function (table) {
     table.uuid('id').primary().defaultTo(knex.fn.uuid());
-    table.uuid('brain_id').references('brains.id').notNullable().onDelete('CASCADE');
+    table.uuid('team_id').references('teams.id').notNullable().onDelete('CASCADE');
     table.string('acronym').notNullable();
     table.timestamps();
-    table.unique(['brain_id', 'acronym'])
+    table.unique(['team_id', 'acronym'])
   });
 
   await knex.schema.createTable('definitions', function (table) {
@@ -32,6 +36,6 @@ export async function up(knex) {
 export async function down(knex) {
   await knex.schema.dropTable('definitions');
   await knex.schema.dropTable('acronyms');
-  await knex.schema.dropTable('brains');
   await knex.schema.dropTable('teams');
+  await knex.schema.dropTable('enterprises');
 };

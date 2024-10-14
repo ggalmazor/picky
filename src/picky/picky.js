@@ -15,6 +15,7 @@ export default class Picky {
 
   static async from(db, app) {
     const teamInfo = await app.client.team.info();
+    await DbMemory.setUpTeam(db, teamInfo.team);
     const memory = await DbMemory.from(db, teamInfo.team);
     const brain = new Brain(new RandomAcronyms(Math.random), memory, app.logger);
     const replies = Replies.load(brain, app.logger);

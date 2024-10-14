@@ -1,12 +1,12 @@
-import { TestLogger, testSlackClient } from '../../test/utils.js';
+import {TestLogger, testSlackClient} from '../../test/utils.js';
 import Picky from './picky.js';
 import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 import Replies from '../replies/replies.js';
 import Commands from '../commands/commands.js';
 import VolatileMemory from '../brain/memory/volatile-memory.js';
-import { allOf, assertThat, empty, hasItem, instanceOf, is, not } from 'hamjest';
-import { v4 as uuid } from 'uuid';
+import {allOf, assertThat, empty, hasItem, instanceOf, is, not} from 'hamjest';
+import {v4 as uuid} from 'uuid';
 import knex from 'knex';
 import profiles from '../../knexfile.js';
 import DbMemory from '../brain/memory/db-memory.js';
@@ -14,7 +14,8 @@ import DbMemory from '../brain/memory/db-memory.js';
 function buildReplyOrCommandSpy(testResult) {
   const acceptSpy = jest.fn();
 
-  function Constructor() {}
+  function Constructor() {
+  }
 
   Constructor.test = () => testResult;
   Constructor.prototype.accept = acceptSpy;
@@ -23,7 +24,7 @@ function buildReplyOrCommandSpy(testResult) {
 }
 
 describe('Picky.from(...) factory', () => {
-  let db, teamId, app;
+  let db, team, teamId, app;
 
   beforeAll(async () => {
     db = knex(profiles.test);
@@ -32,15 +33,14 @@ describe('Picky.from(...) factory', () => {
   beforeEach(async () => {
     await db.raw('START TRANSACTION');
     teamId = uuid();
+    team = {
+      id: teamId,
+      name: 'Test team',
+      url: 'https://test.team.org',
+    }
 
-    app = { client: testSlackClient(), logger: new TestLogger() };
-    app.client.team.info = jest.fn().mockResolvedValue({
-      team: {
-        id: teamId,
-        name: 'Test team',
-        url: 'https://test.team.org',
-      },
-    });
+    app = {client: testSlackClient(), logger: new TestLogger()};
+    app.client.team.info = jest.fn().mockResolvedValue({team});
   });
 
   afterEach(async () => {
@@ -55,6 +55,14 @@ describe('Picky.from(...) factory', () => {
     await Picky.from(db, app);
 
     expect(app.client.team.info).toHaveBeenCalled();
+  });
+
+  it("sets up the team", async () => {
+    const spy = jest.spyOn(DbMemory, "setUpTeam");
+
+    await Picky.from(db, app);
+
+    expect(spy).toHaveBeenCalledWith(db, team);
   });
 
   it('configures the dependencies tree and returns a new Picky instance', async () => {
@@ -75,7 +83,7 @@ describe('Picky', () => {
   let brain, client, logger, replies, commands, say, subject, payload;
 
   function buildPayload(text = 'foo bar baz', botUserId = 'U07QZFMN8MU') {
-    return { event: { text }, context: { botUserId }, say };
+    return {event: {text}, context: {botUserId}, say};
   }
 
   beforeEach(() => {
@@ -113,7 +121,7 @@ describe('Picky', () => {
       it('executes the Reply', async () => {
         await subject.onMessage(payload);
 
-        expect(replySpy).toHaveBeenCalledWith({ text: payload.event.text }, say);
+        expect(replySpy).toHaveBeenCalledWith({text: payload.event.text}, say);
       });
 
       describe('when the message includes a mention to Picky', () => {
@@ -200,7 +208,7 @@ describe('Picky', () => {
       it('executes the Reply', async () => {
         await subject.onAppMention(payload);
 
-        expect(commandSpy).toHaveBeenCalledWith({ text: payload.event.text }, say);
+        expect(commandSpy).toHaveBeenCalledWith({text: payload.event.text}, say);
       });
     });
 
