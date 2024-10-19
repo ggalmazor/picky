@@ -11,6 +11,10 @@ describe('ListCommand', () => {
       assertThat(ListCommand.test({ text: '@Picky list' }), is(true));
       assertThat(ListCommand.test({ text: '<@U07Q4GM0KSB> list' }), is(true));
       assertThat(ListCommand.test({ text: 'list' }), is(true));
+
+      assertThat(ListCommand.test({ text: '@Picky list ignored' }), is(false));
+      assertThat(ListCommand.test({ text: '<@U07Q4GM0KSB> list ignored' }), is(false));
+      assertThat(ListCommand.test({ text: 'list ignored' }), is(false));
     });
   });
 
