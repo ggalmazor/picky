@@ -4,7 +4,7 @@ import knex from 'knex';
 import Picky from './picky/picky.js';
 import SlackOAuth from './slack/oauth.js';
 import Installer from './slack/installer.js';
-import SlackClients from "./slack/clients.js";
+import SlackClients from './slack/clients.js';
 
 const db = knex({
   client: 'postgresql',
