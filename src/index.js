@@ -26,8 +26,8 @@ const app = new bolt.App({
 
 const picky = await Picky.from(db, app);
 const slackOAuth = new SlackOAuth(app.client, {
-  CLIENT_ID: process.env.CLIENT_ID,
-  CLIENT_SECRET: process.env.CLIENT_SECRET,
+  id: process.env.CLIENT_ID,
+  secret: process.env.CLIENT_SECRET,
 });
 const installer = Installer.from(picky);
 

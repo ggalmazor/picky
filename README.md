@@ -3,9 +3,9 @@
 ![CI](https://github.com/ggalmazor/picky/actions/workflows/ci.yml/badge.svg)
 
 (nit)Picky explains the acronyms that you use in Slack:
-- Invite Picky to a channel and it will listen to what you say
-- When someone uses an acronym, Picky will define it.
-- Picky remembers all the acronyms that has explained. However, Picky makes up random definitions, so you better teach it the good ones!
+- Invite Picky to a channel, and it will listen to what you say
+- Picky will define an acronym when someone uses it.
+- Picky remembers all the acronyms that have been explained. However, Picky makes up random definitions, so you better teach it the good ones!
 
 ## Commands: Learn new acronym definition
 
