@@ -11,7 +11,7 @@ export default class SlackClients {
   }
 
   static build(db, logger) {
-    return new ClientCache(db, logger, ClientCache.empty());
+    return new SlackClients(db, logger, ClientCache.empty());
   }
 
   async get(context) {

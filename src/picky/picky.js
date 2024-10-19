@@ -17,7 +17,7 @@ export default class Picky {
   static async from(db, app) {
     const memory = new DbMemory(db);
     const brain = new Brain(new RandomAcronyms(Math.random), memory, app.logger);
-    const clients = new SlackClients(db, app.logger);
+    const clients = SlackClients.build(db, app.logger);
     const replies = Replies.load(brain, clients, app.logger);
     const commands = Commands.load(brain, clients, app.logger);
     return new Picky(brain, replies, commands, clients, app.logger);
