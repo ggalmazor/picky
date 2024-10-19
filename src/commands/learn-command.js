@@ -3,9 +3,9 @@ function learnCommandMatcher() {
 }
 
 export default class LearnCommand {
-  constructor(brain, client, logger) {
+  constructor(brain, clients, logger) {
     this.brain = brain;
-    this.client = client;
+    this.clients = clients;
     this.logger = logger;
   }
 
@@ -13,10 +13,11 @@ export default class LearnCommand {
     return learnCommandMatcher().test(event.text);
   }
 
-  async accept(event) {
+  async accept(context, event) {
+    const client = await this.clients.get(context);
     const [, acronym, definition] = event.text.match(learnCommandMatcher());
 
-    await this.brain.learn(acronym, definition);
-    this.client.reactions.add({ name: 'white_check_mark', channel: event.channel, timestamp: event.ts });
+    await this.brain.learn(context, acronym, definition);
+    await client.reactions.add({ name: 'white_check_mark', channel: event.channel, timestamp: event.ts });
   }
 }
