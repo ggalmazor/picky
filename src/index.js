@@ -30,7 +30,7 @@ const picky = await Picky.from(db, app, clients);
 const slackOAuth = new SlackOAuth(app.client, {
   id: process.env.CLIENT_ID,
   secret: process.env.CLIENT_SECRET,
-});
+}, app.logger);
 const installer = new Installer(db, clients);
 
 app.event('message', async (payload) => {
