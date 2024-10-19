@@ -80,5 +80,18 @@ describe('ListCommand', () => {
         });
       });
     });
+
+    it('replies with a notice when there are no acronyms to list', async () => {
+      const spy = jest.spyOn(client.chat, 'postMessage');
+      await memory.forget(context, 'ABC');
+      await memory.forget(context, 'DEF');
+
+      await subject.accept(context, event);
+
+      expect(spy).toHaveBeenCalledWith({
+        channel: event.channel,
+        text: `No acronyms to list`
+      });
+    })
   });
 });

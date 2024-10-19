@@ -24,7 +24,7 @@ export default class ListCommand {
         ? `${acronym} ${ignored ? '(ignored) ' : ''}stands for: \`${definitions[0]}\``
         : `${acronym} ${ignored ? '(ignored) ' : ''}stands for:\n\`\`\`\n${definitions.join('\n')}\n\`\`\``;
     }));
-    const text = definedAcronyms.join('\n\n');
+    const text = definedAcronyms.length === 0 ? 'No acronyms to list' : definedAcronyms.join('\n\n');
     await client.chat.postMessage({channel: event.channel, text});
   }
 }

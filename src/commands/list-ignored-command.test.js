@@ -1,20 +1,20 @@
 import ListIgnoredCommand from './list-ignored-command.js';
-import { assertThat, is } from 'hamjest';
+import {assertThat, is} from 'hamjest';
 import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
-import { TestLogger, testSlackClient } from '../../test/utils.js';
+import {TestLogger, testSlackClient} from '../../test/utils.js';
 import VolatileMemory from '../brain/memory/volatile-memory.js';
 
 describe('ListIgnoredCommand', () => {
   describe('test', () => {
     it('returns true if the provided text matches the expected pattern for this Command', () => {
-      assertThat(ListIgnoredCommand.test({ text: '@Picky list' }), is(false));
-      assertThat(ListIgnoredCommand.test({ text: '<@U07Q4GM0KSB> list' }), is(false));
-      assertThat(ListIgnoredCommand.test({ text: 'list' }), is(false));
+      assertThat(ListIgnoredCommand.test({text: '@Picky list'}), is(false));
+      assertThat(ListIgnoredCommand.test({text: '<@U07Q4GM0KSB> list'}), is(false));
+      assertThat(ListIgnoredCommand.test({text: 'list'}), is(false));
 
-      assertThat(ListIgnoredCommand.test({ text: '@Picky list ignored' }), is(true));
-      assertThat(ListIgnoredCommand.test({ text: '<@U07Q4GM0KSB> list ignored' }), is(true));
-      assertThat(ListIgnoredCommand.test({ text: 'list ignored' }), is(true));
+      assertThat(ListIgnoredCommand.test({text: '@Picky list ignored'}), is(true));
+      assertThat(ListIgnoredCommand.test({text: '<@U07Q4GM0KSB> list ignored'}), is(true));
+      assertThat(ListIgnoredCommand.test({text: 'list ignored'}), is(true));
     });
   });
 
@@ -44,7 +44,7 @@ describe('ListIgnoredCommand', () => {
       );
 
       context = {};
-      event = { channel: 'C07QK0MHHKM', text: '@Picky list ignored' };
+      event = {channel: 'C07QK0MHHKM', text: '@Picky list ignored'};
     });
 
     it('uses the brain to get ignored acronyms and their definitions', async () => {
@@ -63,6 +63,18 @@ describe('ListIgnoredCommand', () => {
       expect(spy).toHaveBeenCalledWith({
         channel: event.channel,
         text: `ABC (ignored) stands for:\n\`\`\`\nAgile Bouncy Coyote\nAnother Banging Chaos\n\`\`\``
+      });
+    });
+
+    it('replies with a notice when there are no acronyms to list', async () => {
+      const spy = jest.spyOn(client.chat, 'postMessage');
+      await memory.stopIgnoring(context, 'ABC');
+
+      await subject.accept(context, event);
+
+      expect(spy).toHaveBeenCalledWith({
+        channel: event.channel,
+        text: `No acronyms to list`
       });
     });
   });
