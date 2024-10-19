@@ -20,4 +20,8 @@ export default class Brain {
   async forget(context, acronym, definition) {
     return this.memory.forget(context, acronym, definition);
   }
+
+  async list(context) {
+    return this.memory.list(context);
+  }
 }

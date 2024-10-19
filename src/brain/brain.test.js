@@ -61,4 +61,17 @@ describe('Brain', () => {
       assertThat(await subject.getDefinitions({}, 'ABC'), equalTo(['Agile Bouncy Coyote']));
     });
   });
+
+  describe('list', () => {
+    it('lists known acronyms', async () => {
+      const subject = new Brain(
+        new RandomAcronyms(deterministicRandom()),
+        new VolatileMemory({ ABC: ['Agile Bouncy Coyote'] }),
+      );
+
+      const list = await subject.list({});
+
+      assertThat(list, equalTo({ABC: ['Agile Bouncy Coyote']}));
+    });
+  });
 });
