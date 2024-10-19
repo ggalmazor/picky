@@ -5,6 +5,7 @@ import Picky from './picky/picky.js';
 import SlackOAuth from './slack/oauth.js';
 import Installer from './slack/installer.js';
 import SlackClients from './slack/clients.js';
+import {LogLevel} from "@slack/web-api";
 
 const db = knex({
   client: 'postgresql',
@@ -23,6 +24,7 @@ const app = new bolt.App({
   token: process.env.SLACK_BOT_TOKEN,
   socketMode: process.env.SLACK_APP_MODE === 'socket',
   appToken: process.env.SLACK_APP_TOKEN,
+  logLevel: LogLevel.DEBUG,
 });
 
 const clients = SlackClients.build(db, app.logger);
