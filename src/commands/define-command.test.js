@@ -18,15 +18,16 @@ describe('DefineCommand', () => {
   });
 
   describe('apply', () => {
-    let brain, client, logger, subject;
+    let brain, memory, client, logger, subject;
     let context, event;
 
     beforeEach(() => {
+      memory = new VolatileMemory({
+        API: ['Application Programming Interface'],
+      });
       brain = new Brain(
         new RandomAcronyms(),
-        new VolatileMemory({
-          API: ['Application Programming Interface'],
-        }),
+        memory,
       );
       client = testSlackClient();
       logger = new TestLogger();
@@ -76,6 +77,21 @@ describe('DefineCommand', () => {
         expect(spy).toHaveBeenCalledWith({
           channel: event.channel,
           text: 'API stands for:\n```\nApplication Programming Interface\nApple Pie Inside\n```',
+        });
+      });
+    });
+
+    describe("when the acronym is ignored", () => {
+      it("adds a note in the reply message", async () => {
+        await memory.ignore(context, 'API');
+
+        const spy = jest.spyOn(client.chat, 'postMessage');
+
+        await subject.accept(context, event);
+
+        expect(spy).toHaveBeenCalledWith({
+          channel: event.channel,
+          text: 'API (ignored) stands for: `Application Programming Interface`',
         });
       });
     });
