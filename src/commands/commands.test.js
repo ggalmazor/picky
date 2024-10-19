@@ -5,9 +5,9 @@ import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 import { TestLogger, testSlackClient } from '../../test/utils.js';
 
 class TestCommand {
-  constructor(brain, client, logger) {
+  constructor(brain, clients, logger) {
     this.logger = logger;
-    this.client = client;
+    this.clients = clients;
     this.brain = brain;
   }
 
@@ -21,16 +21,16 @@ function buildEvent() {
 }
 
 describe('Commands', () => {
-  let brain, client, logger, subject;
+  let brain, clients, logger, subject;
 
   beforeEach(() => {
     brain = new Brain(new RandomAcronyms(), {
       HTML: ['Hyper Text Markup Language'],
       API: ['Application Programming Interface'],
     });
-    client = testSlackClient();
+    clients = {};
     logger = new TestLogger();
-    subject = new Commands([], brain, client, logger);
+    subject = new Commands([], brain, clients, logger);
   });
 
   describe('get', () => {
@@ -44,7 +44,7 @@ describe('Commands', () => {
       });
 
       it('passes through the brain, client, and logger instances', () => {
-        assertThat(subject.get(buildEvent()), hasProperties({ brain, client, logger }));
+        assertThat(subject.get(buildEvent()), hasProperties({ brain, clients, logger }));
       });
     });
 

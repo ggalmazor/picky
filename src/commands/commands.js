@@ -5,10 +5,10 @@ import DefineCommand from './define-command.js';
 const COMMANDS = [ForgetCommand, LearnCommand, DefineCommand];
 
 export default class Commands {
-  constructor(commands, brain, client, logger) {
+  constructor(commands, brain, clients, logger) {
     this.commands = commands;
     this.brain = brain;
-    this.client = client;
+    this.clients = clients;
     this.logger = logger;
   }
 
@@ -24,6 +24,6 @@ export default class Commands {
     const CommandConstructor = this.commands.find((Command) => Command.test(event));
     if (CommandConstructor === undefined) return;
 
-    return new CommandConstructor(this.brain, this.client, this.logger);
+    return new CommandConstructor(this.brain, this.clients, this.logger);
   }
 }
