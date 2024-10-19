@@ -75,7 +75,7 @@ describe('Brain', () => {
     });
   });
 
-  describe('ignore & isIgnored', () => {
+  describe('ignore, isIgnored & stopIgnoring', () => {
     it('returns a boolean telling if the acronym is ignored', async () => {
       const subject = new Brain(
         new RandomAcronyms(deterministicRandom()),
@@ -86,6 +86,10 @@ describe('Brain', () => {
 
       assertThat(await subject.isIgnored({}, 'ABC'), is(true));
       assertThat(await subject.isIgnored({}, 'DEF'), is(false));
+
+      await subject.stopIgnoring({}, 'ABC');
+
+      assertThat(await subject.isIgnored({}, 'ABC'), is(false));
     });
   });
 });

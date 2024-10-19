@@ -32,4 +32,8 @@ export default class Brain {
   async isIgnored(context, acronym) {
     return this.memory.isIgnored(context, acronym);
   }
+
+  async stopIgnoring(context, acronym) {
+    return this.memory.stopIgnoring(context, acronym);
+  }
 }
