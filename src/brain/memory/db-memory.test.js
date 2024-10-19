@@ -4,6 +4,7 @@ import {assertThat, equalTo, instanceOf, is, isRejectedWith, promiseThat} from '
 import knex from 'knex';
 import profiles from '../../../knexfile.js';
 import {TeamNeedsSetUpError} from '../../errors/errors.js';
+import VolatileMemory from "./volatile-memory.js";
 
 describe('Database memory', () => {
   let db;
@@ -189,4 +190,36 @@ describe('Database memory', () => {
       assertThat(list, equalTo({}));
     });
   });
+
+  describe('ignore', () => {
+    it('sets the ignored flag to true on the provided acronym', async () => {
+      await db('acronyms').insert({team_id: teamId, acronym: 'ABC', ignored: false});
+
+      await subject.ignore(context, 'ABC');
+
+      const isIgnored = (await db('acronyms').select('ignored').where('acronym', 'ABC').first()).ignored;
+      assertThat(isIgnored, is(true));
+    });
+
+    it("creates an acronym row to remember the preference if the acronym doesn't exist", async () => {
+      await subject.ignore(context, 'ABC');
+
+      const isIgnored = (await db('acronyms').select('ignored').where('acronym', 'ABC').first()).ignored;
+      assertThat(isIgnored, is(true));
+    });
+  });
+
+  describe('isIgnored', () => {
+    it('returns the value of the `ignored` column in the acronym row', async () => {
+      await db('acronyms').insert({team_id: teamId, acronym: 'ABC', ignored: false});
+      await db('acronyms').insert({team_id: teamId, acronym: 'DEF', ignored: true});
+
+      assertThat(await subject.isIgnored(context, 'ABC'), is(false));
+      assertThat(await subject.isIgnored(context, 'DEF'), is(true));
+    });
+
+    it("returns false if there's no row for the provided acronym", async () => {
+      assertThat(await subject.isIgnored(context, 'ABC'), is(false));
+    });
+  })
 });

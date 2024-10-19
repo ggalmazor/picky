@@ -1,6 +1,7 @@
 export default class VolatileMemory {
-  constructor(data = {}) {
+  constructor(data = {}, ignored = []) {
     this.data = data;
+    this.ignored = ignored;
   }
 
   async knows(context, acronym, definition) {
@@ -32,5 +33,13 @@ export default class VolatileMemory {
 
   async list(context) {
     return this.data;
+  }
+
+  async ignore(context, acronym){
+    this.ignored.push(acronym);
+  }
+
+  async isIgnored(context, acronym) {
+    return this.ignored.includes(acronym);
   }
 }

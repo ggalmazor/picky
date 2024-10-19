@@ -16,7 +16,7 @@ export default class DbMemory {
     const slackId = buildSlackId(enterpriseId, teamId);
     const result = await this.db('teams').select('id').where({slack_id: slackId}).first();
 
-    if (result === undefined) throw new TeamNeedsSetUpError();
+    if (result === undefined) throw new TeamNeedsSetUpError(enterpriseId, teamId);
 
     return result.id;
   }
@@ -62,18 +62,12 @@ export default class DbMemory {
   async learn(context, acronym, definition) {
     const teamId = await this.teamId(context);
 
-    let acronymId;
-    const result = await this.db('acronyms')
-      .select('acronyms.id')
-      .where('team_id', teamId)
-      .where('acronym', acronym)
-      .first();
-    if (result === undefined) {
-      acronymId = (await this.db('acronyms').returning('acronyms.id').insert({team_id: teamId, acronym: acronym}))[0]
-        .id;
-    } else {
-      acronymId = result.id;
-    }
+    await this.db('acronyms')
+      .insert({team_id: teamId, acronym: acronym})
+      .onConflict(['team_id', 'acronym'])
+      .ignore();
+
+    const acronymId = (await this.db('acronyms').select('id').where({ team_id: teamId, acronym}).first()).id;
 
     await this.db('definitions')
       .onConflict(['acronym_id', 'definition'])
@@ -120,5 +114,25 @@ export default class DbMemory {
       agg[acronym] = definitions;
       return agg;
     }, {});
+  }
+
+  async ignore(context, acronym) {
+    const teamId = await this.teamId(context);
+
+    await this.db('acronyms')
+      .insert({team_id: teamId, acronym: acronym, ignored: true})
+      .onConflict(['team_id', 'acronym'])
+      .merge();
+  }
+
+  async isIgnored(context, acronym) {
+    const teamId = await this.teamId(context);
+
+    const result = await this.db('acronyms')
+      .select('ignored')
+      .where({team_id: teamId, acronym})
+      .first();
+
+    return result?.ignored || false;
   }
 }

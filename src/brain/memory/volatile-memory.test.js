@@ -83,4 +83,17 @@ describe('Volatile memory', () => {
       }));
     });
   });
+
+  describe('ignore & isIgnored', () => {
+    beforeEach(() => {
+      subject = new VolatileMemory();
+    });
+
+    it('returns true if the acronym is ignored', async () => {
+      await subject.ignore({}, 'ABC');
+
+      assertThat(await subject.isIgnored({}, 'ABC'), is(true));
+      assertThat(await subject.isIgnored({}, 'DEF'), is(false));
+    });
+  });
 });
