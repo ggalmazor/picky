@@ -25,7 +25,7 @@ export default class VolatileMemory {
 
   async forget(context, acronym, definition) {
     if (!(acronym in this.data)) return Promise.resolve();
-    this.data[acronym] = this.data[acronym].filter((def) => def !== definition);
+    this.data[acronym] = definition === undefined ? [] : this.data[acronym].filter((def) => def !== definition);
     if (this.data[acronym].length === 0) delete this.data[acronym];
     return Promise.resolve();
   }

@@ -1,5 +1,5 @@
 import VolatileMemory from './volatile-memory.js';
-import { assertThat, equalTo, is } from 'hamjest';
+import {assertThat, before, equalTo, is} from 'hamjest';
 
 describe('Volatile memory', () => {
   let subject;
@@ -49,8 +49,18 @@ describe('Volatile memory', () => {
   });
 
   describe('forget', () => {
+    beforeEach(() => {
+      subject = new VolatileMemory({ ABC: ['Agile Bouncy Coyote', 'Amazing Bright Castle'] });
+    });
+
     it('forgets existing definitions', async () => {
       await subject.forget({}, 'ABC', 'Agile Bouncy Coyote');
+
+      assertThat(await subject.recall({}, 'ABC'), equalTo(['Amazing Bright Castle']));
+    });
+
+    it('forgets the acronym if no definition is provided', async () => {
+      await subject.forget({}, 'ABC');
 
       assertThat(await subject.recall({}, 'ABC'), equalTo([]));
     });

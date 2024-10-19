@@ -113,9 +113,12 @@ describe('Database memory', () => {
   });
 
   describe('forget', () => {
-    it('deletes the row in `definitions` for the provided acronym and definition', async () => {
+    beforeEach(async () => {
       await db('definitions').insert({ acronym_id: acronymId, definition: 'Amazing Bright Castle' });
+      await db('definitions').insert({ acronym_id: acronymId, definition: 'Another Bouncy Croissant' });
+    });
 
+    it('deletes the row in `definitions` for the provided acronym and definition', async () => {
       await subject.forget(context, 'ABC', 'Agile Bouncy Coyote');
 
       assertThat(await subject.knows(context, 'ABC', 'Agile Bouncy Coyote'), is(false));
@@ -124,6 +127,16 @@ describe('Database memory', () => {
 
     it('deletes the row in `acronyms` if there are no more definitions', async () => {
       await subject.forget(context, 'ABC', 'Agile Bouncy Coyote');
+
+      const count = (await db('acronyms').count('id', { as: 'count' }).where({ id: acronymId }))[0].count;
+      assertThat(count, is('0'));
+    });
+
+    it('deletes the acronym with all definitions if no definition is provided', async () => {
+      await subject.forget(context, 'ABC');
+
+      const definitionsCount = (await db('definitions').count('id', { as: 'count' }).where({ id: acronymId }))[0].count;
+      assertThat(definitionsCount, is('0'));
 
       const count = (await db('acronyms').count('id', { as: 'count' }).where({ id: acronymId }))[0].count;
       assertThat(count, is('0'));
