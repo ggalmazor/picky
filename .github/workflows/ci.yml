@@ -9,7 +9,7 @@ env:
   DATABASE_PASSWORD: ""
   DATABASE_NAME: "picky"
   NODE_ENV: "test"
-  POSTGRES_USER: ${{ env.DATABASE_USER }}
+  POSTGRES_USER: "postgres"
   POSTGRES_HOST_AUTH_METHOD: trust
 
 jobs:
