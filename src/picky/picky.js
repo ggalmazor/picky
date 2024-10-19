@@ -38,7 +38,7 @@ export default class Picky {
       return;
     }
 
-    this.logger.info(`Replying to message: ${event.text}`);
+    this.logger.debug(`Replying to message: ${event.text}`);
     await reply.accept(context, event);
   }
 
@@ -59,7 +59,7 @@ export default class Picky {
       return;
     }
 
-    this.logger.info(`Replying to mention: ${event.text}`);
+    this.logger.debug(`Replying to mention: ${event.text}`);
     await command.accept(context, event);
   }
 

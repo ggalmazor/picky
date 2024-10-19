@@ -109,10 +109,10 @@ describe('Picky', () => {
         replies.add(Reply);
       });
 
-      it('logs an info message', async () => {
+      it('logs a debug message', async () => {
         await subject.onMessage(payload);
 
-        assertThat(logger.messages.info, hasItem(`Replying to message: ${event.text}`));
+        assertThat(logger.messages.debug, hasItem(`Replying to message: ${event.text}`));
       });
 
       it('executes the Reply', async () => {
@@ -173,10 +173,10 @@ describe('Picky', () => {
         commands.add(Command);
       });
 
-      it('logs an info message', async () => {
+      it('logs a debug message', async () => {
         await subject.onAppMention(payload);
 
-        assertThat(logger.messages.info, hasItem(`Replying to mention: ${event.text}`));
+        assertThat(logger.messages.debug, hasItem(`Replying to mention: ${event.text}`));
       });
 
       it('executes the Reply', async () => {

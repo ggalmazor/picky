@@ -68,7 +68,6 @@ describe('Boot up script (index)', () => {
             token: 'SLACK_BOT_TOKEN',
             socketMode: false,
             appToken: 'SLACK_APP_TOKEN',
-            logLevel: LogLevel.DEBUG,
           });
         },
       );
@@ -91,7 +90,6 @@ describe('Boot up script (index)', () => {
               token: 'SLACK_BOT_TOKEN',
               socketMode: true,
               appToken: 'SLACK_APP_TOKEN',
-              logLevel: LogLevel.DEBUG,
             });
           },
         );

@@ -24,7 +24,6 @@ const app = new bolt.App({
   token: process.env.SLACK_BOT_TOKEN,
   socketMode: process.env.SLACK_APP_MODE === 'socket',
   appToken: process.env.SLACK_APP_TOKEN,
-  logLevel: LogLevel.DEBUG,
 });
 
 const clients = SlackClients.build(db, app.logger);
