@@ -34,4 +34,35 @@ You can make Picky define an acronym:
 @picky define <acronym>
 ```
 
-Picky will reply in the same channel with definitions for the provided acronym
+Picky will reply in the same channel with definitions for the provided acronym. It will also add a note if the acronym is ignored.
+
+## Commands: Ignore an acronym
+
+You can make Picky ignore an acronym:
+```
+@picky ignore <acronym>
+```
+
+Picky will add a ✅ reaction when it's done and it won't define it when someone includes it in a message.
+
+## Commands: Stop ignoring an acronym
+
+You can make Picky stop ignoring an acronym:
+```
+@picky stop ignoring <acronym>
+```
+
+Picky will add a ✅ reaction when it's done and it won't ignore it when someone includes it in a message.
+
+## Commands: List acronyms
+
+You can ask Picky to list all acronyms it knows:
+```
+@picky list [ignored]
+```
+
+Picky will respond with a message with all the acronyms it knows with their definitions. It will also add a note in ignored acronyms.
+
+If you add ` ignored` to the command, it will only list the ignored acronyms.
+
+
