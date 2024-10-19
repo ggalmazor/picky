@@ -1,6 +1,6 @@
 import Brain from './brain.js';
 import RandomAcronyms from './acronyms/random-acronyms.js';
-import { assertThat, equalTo } from 'hamjest';
+import {assertThat, equalTo, is} from 'hamjest';
 import VolatileMemory from './memory/volatile-memory.js';
 import { deterministicRandom } from '../../test/utils.js';
 
@@ -72,6 +72,20 @@ describe('Brain', () => {
       const list = await subject.list({});
 
       assertThat(list, equalTo({ABC: ['Agile Bouncy Coyote']}));
+    });
+  });
+
+  describe('ignore & isIgnored', () => {
+    it('returns a boolean telling if the acronym is ignored', async () => {
+      const subject = new Brain(
+        new RandomAcronyms(deterministicRandom()),
+        new VolatileMemory(),
+      );
+
+      await subject.ignore({}, 'ABC');
+
+      assertThat(await subject.isIgnored({}, 'ABC'), is(true));
+      assertThat(await subject.isIgnored({}, 'DEF'), is(false));
     });
   });
 });
