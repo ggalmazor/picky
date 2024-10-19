@@ -1,12 +1,12 @@
-import { TestLogger, testSlackClient } from '../../test/utils.js';
+import {TestLogger, testSlackClient} from '../../test/utils.js';
 import Picky from './picky.js';
 import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 import Replies from '../replies/replies.js';
 import Commands from '../commands/commands.js';
 import VolatileMemory from '../brain/memory/volatile-memory.js';
-import { assertThat, before, empty, hasItem, instanceOf, is, not } from 'hamjest';
-import { v4 as uuid } from 'uuid';
+import {assertThat, empty, hasItem, instanceOf, is, not} from 'hamjest';
+import {v4 as uuid} from 'uuid';
 import knex from 'knex';
 import profiles from '../../knexfile.js';
 import DbMemory from '../brain/memory/db-memory.js';
@@ -14,7 +14,8 @@ import DbMemory from '../brain/memory/db-memory.js';
 function buildReplyOrCommandSpy(testResult) {
   const acceptSpy = jest.fn();
 
-  function Constructor() {}
+  function Constructor() {
+  }
 
   Constructor.test = () => testResult;
   Constructor.prototype.accept = acceptSpy;
@@ -38,8 +39,8 @@ describe('Picky.from(...) factory', () => {
       url: 'https://test.team.org',
     };
 
-    app = { client: testSlackClient(), logger: new TestLogger() };
-    app.client.team.info = jest.fn().mockResolvedValue({ team });
+    app = {client: testSlackClient(), logger: new TestLogger()};
+    app.client.team.info = jest.fn().mockResolvedValue({team});
   });
 
   afterEach(async () => {
@@ -97,8 +98,8 @@ describe('Picky', () => {
   describe('onMessage', () => {
     beforeEach(async () => {
       context = {};
-      event = { type: 'message', channel: 'C07QK0MHHKM', text: 'Some message', ts: 1728412412 };
-      payload = { event, context };
+      event = {type: 'message', channel: 'C07QK0MHHKM', text: 'Some message', ts: 1728412412};
+      payload = {event, context};
     });
 
     describe("when there's a Reply for the message", () => {
@@ -161,8 +162,8 @@ describe('Picky', () => {
   describe('onAppMention', () => {
     beforeEach(async () => {
       context = {};
-      event = { type: 'app_mention', channel: 'C07QK0MHHKM', text: '@Picky do something', ts: 1728412412 };
-      payload = { event, context };
+      event = {type: 'app_mention', channel: 'C07QK0MHHKM', text: '@Picky do something', ts: 1728412412};
+      payload = {event, context};
     });
 
     describe("when there's a Command for the message", () => {
@@ -224,9 +225,9 @@ describe('Picky', () => {
 
   describe('onAppHomeOpened', () => {
     beforeEach(async () => {
-      context = { userId: 'U123ABC456' };
-      event = { type: 'app_home_opened', channel: 'C07QK0MHHKM', tab: 'home', view: {} };
-      payload = { event, context };
+      context = {userId: 'U123ABC456'};
+      event = {type: 'app_home_opened', channel: 'C07QK0MHHKM', tab: 'home', view: {}};
+      payload = {event, context};
     });
 
     it('uses a Slack client to publish a view', async () => {

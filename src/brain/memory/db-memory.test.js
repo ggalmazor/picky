@@ -1,22 +1,9 @@
-import { v4 as uuid } from 'uuid';
-import DbMemory, { buildSlackId } from './db-memory.js';
-import {
-  assertThat,
-  containsString,
-  equalTo,
-  hasProperties,
-  hasProperty,
-  instanceOf,
-  is,
-  isRejectedWith,
-  not,
-  promiseThat,
-  rejected,
-  throws,
-} from 'hamjest';
+import {v4 as uuid} from 'uuid';
+import DbMemory, {buildSlackId} from './db-memory.js';
+import {assertThat, equalTo, instanceOf, is, isRejectedWith, promiseThat,} from 'hamjest';
 import knex from 'knex';
 import profiles from '../../../knexfile.js';
-import { TeamNeedsSetUpError } from '../../errors/errors.js';
+import {TeamNeedsSetUpError} from '../../errors/errors.js';
 
 describe('Database memory', () => {
   let db;
@@ -29,9 +16,9 @@ describe('Database memory', () => {
 
   beforeEach(async () => {
     await db.raw('START TRANSACTION');
-    slackTeam = { id: uuid(), name: 'Test team' };
-    slackEnterprise = { id: uuid(), name: 'Test enterprise' };
-    context = { teamId: slackTeam.id, enterpriseId: slackEnterprise.id };
+    slackTeam = {id: uuid(), name: 'Test team'};
+    slackEnterprise = {id: uuid(), name: 'Test enterprise'};
+    context = {teamId: slackTeam.id, enterpriseId: slackEnterprise.id};
 
     const enterpriseId = (
       await db('enterprises').returning('id').insert({
@@ -48,8 +35,8 @@ describe('Database memory', () => {
           name: slackTeam.name,
         })
     )[0].id;
-    acronymId = (await db('acronyms').returning('id').insert({ team_id: teamId, acronym: 'ABC' }))[0].id;
-    await db('definitions').insert({ acronym_id: acronymId, definition: 'Agile Bouncy Coyote' });
+    acronymId = (await db('acronyms').returning('id').insert({team_id: teamId, acronym: 'ABC'}))[0].id;
+    await db('definitions').insert({acronym_id: acronymId, definition: 'Agile Bouncy Coyote'});
 
     subject = new DbMemory(db, teamId);
   });
@@ -78,7 +65,7 @@ describe('Database memory', () => {
 
     it("throws an error when the team hasn't been set up yet", async () => {
       await promiseThat(
-        subject.knows({ teamId: 'unknown' }, 'ABC', 'Amazing Bright Castle'),
+        subject.knows({teamId: 'unknown'}, 'ABC', 'Amazing Bright Castle'),
         isRejectedWith(instanceOf(TeamNeedsSetUpError)),
       );
     });
@@ -94,7 +81,7 @@ describe('Database memory', () => {
     });
 
     it("throws an error when the team hasn't been set up yet", async () => {
-      await promiseThat(subject.recall({ teamId: 'unknown' }, 'ABC'), isRejectedWith(instanceOf(TeamNeedsSetUpError)));
+      await promiseThat(subject.recall({teamId: 'unknown'}, 'ABC'), isRejectedWith(instanceOf(TeamNeedsSetUpError)));
     });
   });
 
@@ -119,7 +106,7 @@ describe('Database memory', () => {
 
     it("throws an error when the team hasn't been set up yet", async () => {
       await promiseThat(
-        subject.learn({ teamId: 'unknown' }, 'ABC', 'Agile Bouncy Coyote'),
+        subject.learn({teamId: 'unknown'}, 'ABC', 'Agile Bouncy Coyote'),
         isRejectedWith(instanceOf(TeamNeedsSetUpError)),
       );
     });
@@ -127,7 +114,7 @@ describe('Database memory', () => {
 
   describe('forget', () => {
     it('deletes the row in `definitions` for the provided acronym and definition', async () => {
-      await db('definitions').insert({ acronym_id: acronymId, definition: 'Amazing Bright Castle' });
+      await db('definitions').insert({acronym_id: acronymId, definition: 'Amazing Bright Castle'});
 
       await subject.forget(context, 'ABC', 'Agile Bouncy Coyote');
 
@@ -138,13 +125,13 @@ describe('Database memory', () => {
     it('deletes the row in `acronyms` if there are no more definitions', async () => {
       await subject.forget(context, 'ABC', 'Agile Bouncy Coyote');
 
-      const count = (await db('acronyms').count('id', { as: 'count' }).where({ id: acronymId }))[0].count;
+      const count = (await db('acronyms').count('id', {as: 'count'}).where({id: acronymId}))[0].count;
       assertThat(count, is('0'));
     });
 
     it("throws an error when the team hasn't been set up yet", async () => {
       await promiseThat(
-        subject.forget({ teamId: 'unknown' }, 'ABC', 'Agile Bouncy Coyote'),
+        subject.forget({teamId: 'unknown'}, 'ABC', 'Agile Bouncy Coyote'),
         isRejectedWith(instanceOf(TeamNeedsSetUpError)),
       );
     });
