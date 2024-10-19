@@ -4,6 +4,7 @@ import knex from 'knex';
 import Picky from './picky/picky.js';
 import SlackOAuth from './slack/oauth.js';
 import Installer from './slack/installer.js';
+import SlackClients from "./slack/clients.js";
 
 const db = knex({
   client: 'postgresql',
@@ -24,12 +25,13 @@ const app = new bolt.App({
   appToken: process.env.SLACK_APP_TOKEN,
 });
 
-const picky = await Picky.from(db, app);
+const clients = SlackClients.build(db, app.logger);
+const picky = await Picky.from(db, app, clients);
 const slackOAuth = new SlackOAuth(app.client, {
   id: process.env.CLIENT_ID,
   secret: process.env.CLIENT_SECRET,
 });
-const installer = Installer.from(picky);
+const installer = new Installer(db, clients);
 
 app.event('message', async (payload) => {
   if (payload.event.bot_profile !== undefined) return;

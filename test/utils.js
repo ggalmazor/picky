@@ -1,5 +1,5 @@
 import Picky from "../src/picky/picky.js";
-import Installer from "../src/slack/installer.js";
+import SlackClients from "../src/slack/clients.js";
 
 const RANDOM_NUMBERS = [
   0.43131150217673775, 0.8812124484754995, 0.7065464533465053,
@@ -123,6 +123,9 @@ export function mockBootUpContext() {
     default: knex
   }))
 
+  const clients = {async get() { return testSlackClient(); } };
+  SlackClients.build = jest.fn().mockReturnValue(clients);
+
   const picky = {
     onMessage: jest.fn().mockResolvedValue(),
     onAppMention: jest.fn().mockResolvedValue(),
@@ -152,8 +155,10 @@ export function mockBootUpContext() {
     completeInstallation: jest.fn().mockResolvedValue("https://foo.slack.com")
   };
 
-  Installer.from = jest.fn().mockReturnValue(installer);
+  jest.unstable_mockModule('../src/slack/installer', () => ({
+    default: jest.fn().mockImplementation(() => installer)
+  }));
 
-  return {app, BoltApp, db, knex, logger, picky, slackOAuth, installer};
+  return {app, BoltApp, db, knex, logger, clients, picky, slackOAuth, installer};
 }
 
