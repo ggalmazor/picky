@@ -9,8 +9,6 @@ env:
   DATABASE_PASSWORD: ""
   DATABASE_NAME: "picky"
   NODE_ENV: "test"
-  POSTGRES_USER: "postgres"
-  POSTGRES_HOST_AUTH_METHOD: trust
 
 jobs:
   build:
@@ -20,6 +18,9 @@ jobs:
         image: postgres:16-alpine
         ports:
           - "5432:5432"
+        env:
+          POSTGRES_USER: ${{ env.DATABASE_USER }}
+          POSTGRES_HOST_AUTH_METHOD: trust
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Check out the code
