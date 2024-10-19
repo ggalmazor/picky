@@ -1,3 +1,5 @@
+import {TeamNeedsSetUpError} from "../../errors/errors.js";
+
 export function buildSlackId(slackEnterpriseId, slackTeamId) {
   if (slackEnterpriseId === undefined)
     return `_.${slackTeamId}`;
@@ -46,7 +48,7 @@ export default class DbMemory {
     const result = await this.db('teams').select("id").where({slack_id: slackId}).first();
 
     if (result === undefined)
-      throw new Error(`Team ${slackId} not found`);
+      throw new TeamNeedsSetUpError();
 
     return result.id;
   }

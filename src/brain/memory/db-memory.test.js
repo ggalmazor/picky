@@ -4,7 +4,7 @@ import {
   assertThat,
   containsString,
   equalTo,
-  hasProperties, hasProperty,
+  hasProperties, hasProperty, instanceOf,
   is,
   isRejectedWith,
   not,
@@ -14,6 +14,7 @@ import {
 } from 'hamjest';
 import knex from 'knex';
 import profiles from '../../../knexfile.js';
+import {TeamNeedsSetUpError} from "../../errors/errors.js";
 
 describe('DbMemory.setUpTeam', () => {
   let db;
@@ -154,7 +155,7 @@ describe('Database memory', () => {
     });
 
     it("throws an error when the team hasn't been set up yet", async () => {
-      await promiseThat(subject.knows({teamId: 'unknown'}, 'ABC', 'Amazing Bright Castle'), isRejectedWith(hasProperty("message", containsString("Team _.unknown not found"))));
+      await promiseThat(subject.knows({teamId: 'unknown'}, 'ABC', 'Amazing Bright Castle'), isRejectedWith(instanceOf(TeamNeedsSetUpError)));
     });
   });
 
@@ -168,7 +169,7 @@ describe('Database memory', () => {
     });
 
     it("throws an error when the team hasn't been set up yet", async () => {
-      await promiseThat(subject.recall({teamId: 'unknown'}, 'ABC'), isRejectedWith(hasProperty("message", containsString("Team _.unknown not found"))));
+      await promiseThat(subject.recall({teamId: 'unknown'}, 'ABC'), isRejectedWith(instanceOf(TeamNeedsSetUpError)));
     });
   });
 
@@ -192,7 +193,7 @@ describe('Database memory', () => {
     });
 
     it("throws an error when the team hasn't been set up yet", async () => {
-      await promiseThat(subject.learn({teamId: 'unknown'}, 'ABC', 'Agile Bouncy Coyote'), isRejectedWith(hasProperty("message", containsString("Team _.unknown not found"))));
+      await promiseThat(subject.learn({teamId: 'unknown'}, 'ABC', 'Agile Bouncy Coyote'), isRejectedWith(instanceOf(TeamNeedsSetUpError)));
     });
   });
 
@@ -214,7 +215,7 @@ describe('Database memory', () => {
     });
 
     it("throws an error when the team hasn't been set up yet", async () => {
-      await promiseThat(subject.forget({teamId: 'unknown'}, 'ABC', 'Agile Bouncy Coyote'), isRejectedWith(hasProperty("message", containsString("Team _.unknown not found"))));
+      await promiseThat(subject.forget({teamId: 'unknown'}, 'ABC', 'Agile Bouncy Coyote'), isRejectedWith(instanceOf(TeamNeedsSetUpError)));
     });
   });
 });
