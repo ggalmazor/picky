@@ -31,7 +31,17 @@ export default class VolatileMemory {
     return Promise.resolve();
   }
 
-  async list(context) {
+  async list(context, ignored) {
+    if (ignored !== undefined) {
+      const selectedAcronyms = Object.keys(this.data).filter((def) => {
+        const isIgnored = this.ignored.includes(def);
+        return ignored ? isIgnored : !isIgnored;
+      });
+      return selectedAcronyms.reduce((acc, acronym) => {
+        acc[acronym] = this.data[acronym];
+        return acc;
+      }, {});
+    }
     return this.data;
   }
 

@@ -82,6 +82,26 @@ describe('Volatile memory', () => {
         DEF: ["Definitely Expensive Flute"],
       }));
     });
+
+    it('returns only ignored acronyms if providing the `ignored = true` param', async () => {
+      await subject.ignore({}, 'DEF');
+
+      const list = await subject.list({}, true);
+
+      assertThat(list, equalTo({
+        DEF: ["Definitely Expensive Flute"],
+      }));
+    });
+
+    it('returns only non-ignored acronyms if providing the `ignored = false` param', async () => {
+      await subject.ignore({}, 'DEF');
+
+      const list = await subject.list({}, false);
+
+      assertThat(list, equalTo({
+        ABC: ['Agile Bouncy Coyote', "Another Banging Chaos"]
+      }));
+    });
   });
 
   describe('ignore, isIgnored & stopIgnoring', () => {

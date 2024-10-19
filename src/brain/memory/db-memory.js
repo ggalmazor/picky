@@ -100,13 +100,18 @@ export default class DbMemory {
     if (count == 0) await this.db('acronyms').delete().where('id', acronymId);
   }
 
-  async list(context) {
+  async list(context, ignored) {
     const teamId = await this.teamId(context);
 
-    const results = await this.db('acronyms')
+    let baseQuery = this.db('acronyms')
       .join('definitions', 'acronym_id', 'acronyms.id')
       .select('acronyms.acronym', this.db.raw('jsonb_agg(definitions.definition) as definitions'))
-      .where('team_id', teamId)
+      .where('team_id', teamId);
+
+    if (ignored !== undefined)
+      baseQuery = baseQuery.where('ignored', ignored);
+
+    const results = await baseQuery
       .groupBy('acronyms.acronym')
       .orderBy("acronyms.acronym");
 

@@ -189,6 +189,34 @@ describe('Database memory', () => {
 
       assertThat(list, equalTo({}));
     });
+
+    it('returns only ignored acronyms if providing the `ignored = true` param', async () => {
+      const abc = (await db('acronyms').returning('id').insert({team_id: teamId, acronym: 'ABC', ignored: false}))[0].id;
+      await db('definitions').insert({acronym_id: abc, definition: 'Agile Bouncy Coyote'});
+      await db('definitions').insert({acronym_id: abc, definition: 'Another Banging Chaos'});
+      const def = (await db('acronyms').returning('id').insert({team_id: teamId, acronym: 'DEF', ignored: true}))[0].id;
+      await db('definitions').insert({acronym_id: def, definition: 'Definitely Expensive Flute'});
+
+      const list = await subject.list(context, true);
+
+      assertThat(list, equalTo({
+        DEF: ["Definitely Expensive Flute"],
+      }));
+    });
+
+    it('returns only non-ignored acronyms if providing the `ignored = false` param', async () => {
+      const abc = (await db('acronyms').returning('id').insert({team_id: teamId, acronym: 'ABC', ignored: false}))[0].id;
+      await db('definitions').insert({acronym_id: abc, definition: 'Agile Bouncy Coyote'});
+      await db('definitions').insert({acronym_id: abc, definition: 'Another Banging Chaos'});
+      const def = (await db('acronyms').returning('id').insert({team_id: teamId, acronym: 'DEF', ignored: true}))[0].id;
+      await db('definitions').insert({acronym_id: def, definition: 'Definitely Expensive Flute'});
+
+      const list = await subject.list(context, false);
+
+      assertThat(list, equalTo({
+        ABC: ['Agile Bouncy Coyote', "Another Banging Chaos"]
+      }));
+    });
   });
 
   describe('ignore', () => {
