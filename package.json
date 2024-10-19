@@ -10,7 +10,7 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles",
     "linter": "eslint .",
     "linter-fix": "eslint --fix .",
-    "format-fix": "prettier -w '*.{js,json}' '{src,tests}/**/*.js'",
+    "format-fix": "prettier -w '*.{js,json}' '{bin,src,tests}/**/*.js'",
     "format-check": "prettier --check '*.{js,json}' '{src,tests}/**/*.js'"
   },
   "repository": {
