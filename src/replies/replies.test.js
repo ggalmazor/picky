@@ -5,8 +5,9 @@ import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 import { TestLogger } from '../../test/utils.js';
 
 class TestReply {
-  constructor(brain, logger) {
+  constructor(brain, clients, logger) {
     this.logger = logger;
+    this.clients = clients;
     this.brain = brain;
   }
 
@@ -20,15 +21,16 @@ function buildEvent() {
 }
 
 describe('Replies', () => {
-  let brain, logger, subject;
+  let brain, clients, logger, subject;
 
   beforeEach(() => {
     brain = new Brain(new RandomAcronyms(), {
       HTML: ['Hyper Text Markup Language'],
       API: ['Application Programming Interface'],
     });
+    clients = {};
     logger = new TestLogger();
-    subject = new Replies([], brain, logger);
+    subject = new Replies([], brain, clients, logger);
   });
 
   describe('get', () => {
