@@ -15,16 +15,17 @@ describe('ListCommand', () => {
   });
 
   describe('apply', () => {
-    let brain, client, logger, subject;
+    let brain, memory, client, logger, subject;
     let context, event;
 
     beforeEach(() => {
+      memory = new VolatileMemory({
+        ABC: ['Agile Bouncy Coyote', "Another Banging Chaos"],
+        DEF: ["Definitely Expensive Flute"],
+      });
       brain = new Brain(
         new RandomAcronyms(),
-        new VolatileMemory({
-          ABC: ['Agile Bouncy Coyote', "Another Banging Chaos"],
-          DEF: ["Definitely Expensive Flute"],
-        }),
+        memory,
       );
       client = testSlackClient();
       logger = new TestLogger();
@@ -58,6 +59,21 @@ describe('ListCommand', () => {
       expect(spy).toHaveBeenCalledWith({
         channel: event.channel,
         text: `ABC stands for:\n\`\`\`\nAgile Bouncy Coyote\nAnother Banging Chaos\n\`\`\`\n\nDEF stands for: \`Definitely Expensive Flute\``
+      });
+    });
+
+    describe("when an acronym is ignored", () => {
+      it("adds a note in the reply message", async () => {
+        await memory.ignore(context, 'ABC');
+
+        const spy = jest.spyOn(client.chat, 'postMessage');
+
+        await subject.accept(context, event);
+
+        expect(spy).toHaveBeenCalledWith({
+          channel: event.channel,
+          text: `ABC (ignored) stands for:\n\`\`\`\nAgile Bouncy Coyote\nAnother Banging Chaos\n\`\`\`\n\nDEF stands for: \`Definitely Expensive Flute\``
+        });
       });
     });
   });

@@ -17,12 +17,14 @@ export default class ListCommand {
     const client = await this.clients.get(context);
 
     const acronyms = await this.brain.list(context);
-    const text = Object.keys(acronyms).map(acronym => {
-     const definitions = acronyms[acronym];
-     return definitions.length === 1
-       ? `${acronym} stands for: \`${definitions[0]}\``
-       : `${acronym} stands for:\n\`\`\`\n${definitions.join('\n')}\n\`\`\``;
-    }).join('\n\n');
-    await client.chat.postMessage({ channel: event.channel, text });
+    const definedAcronyms = await Promise.all(Object.keys(acronyms).map(async acronym => {
+      const ignored = await this.brain.isIgnored(context, acronym);
+      const definitions = acronyms[acronym];
+      return definitions.length === 1
+        ? `${acronym} ${ignored ? '(ignored) ' : ''}stands for: \`${definitions[0]}\``
+        : `${acronym} ${ignored ? '(ignored) ' : ''}stands for:\n\`\`\`\n${definitions.join('\n')}\n\`\`\``;
+    }));
+    const text = definedAcronyms.join('\n\n');
+    await client.chat.postMessage({channel: event.channel, text});
   }
 }
