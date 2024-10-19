@@ -1,8 +1,8 @@
+import ForgetCommand from './forget-command.js';
 import { assertThat, is } from 'hamjest';
 import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 import { TestLogger, testSlackClient } from '../../test/utils.js';
-import ForgetCommand from './forget-command.js';
 import VolatileMemory from '../brain/memory/volatile-memory.js';
 
 describe('ForgetCommand', () => {
@@ -16,6 +16,7 @@ describe('ForgetCommand', () => {
 
   describe('apply', () => {
     let brain, client, logger, subject;
+    let context, event;
 
     beforeEach(() => {
       brain = new Brain(
@@ -27,27 +28,34 @@ describe('ForgetCommand', () => {
       );
       client = testSlackClient();
       logger = new TestLogger();
-      subject = new ForgetCommand(brain, client, logger);
+      subject = new ForgetCommand(brain, {async get() { return client; }}, logger);
+
+      context = {};
+      event = {
+        channel: 'C07QK0MHHKM',
+        text: '@Picky forget API Application Programming Interface',
+        ts: 1728412412
+      };
     });
 
     it('uses the brain to forget the provided acronym definition', async () => {
       const spy = jest.spyOn(brain, 'forget');
 
-      await subject.accept({ text: 'forget API Application Programming Interface', channel: 'C07QK0MHHKM' });
+      await subject.accept(context, event);
 
-      expect(spy).toHaveBeenCalledWith('API', 'Application Programming Interface');
+      expect(spy).toHaveBeenCalledWith(context, 'API', 'Application Programming Interface');
     });
 
-    it('adds a ✅ reaction to the app mention message', async () => {
+    it('uses a Slack client to add a reaction to the received message', async () => {
       const spy = jest.spyOn(client.reactions, 'add');
 
-      await subject.accept({
-        text: 'forget API Application Programming Interface',
-        channel: 'C07QK0MHHKM',
-        ts: 1728412412,
-      });
+      await subject.accept(context, event);
 
-      expect(spy).toHaveBeenCalledWith({ name: 'white_check_mark', channel: 'C07QK0MHHKM', timestamp: 1728412412 });
+      expect(spy).toHaveBeenCalledWith({
+        channel: event.channel,
+        timestamp: event.ts,
+        name: 'white_check_mark'
+      });
     });
   });
 });
