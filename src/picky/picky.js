@@ -3,7 +3,6 @@ import Replies from '../replies/replies.js';
 import Commands from '../commands/commands.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 import DbMemory from '../brain/memory/db-memory.js';
-import SlackClients from '../slack/clients.js';
 
 export default class Picky {
   constructor(brain, replies, commands, clients, logger) {
@@ -22,7 +21,7 @@ export default class Picky {
     return new Picky(brain, replies, commands, clients, app.logger);
   }
 
-  async onMessage({ event, context }, replyAll = false) {
+  async onMessage({event, context}, replyAll = false) {
     const reply = this.replies.get(event);
 
     if (reply === undefined && replyAll) {
@@ -43,7 +42,7 @@ export default class Picky {
     await reply.accept(context, event);
   }
 
-  async onAppMention({ context, event }, replyAll = false) {
+  async onAppMention({context, event}, replyAll = false) {
     const command = this.commands.get(event);
 
     if (command === undefined && replyAll) {
@@ -64,7 +63,7 @@ export default class Picky {
     await command.accept(context, event);
   }
 
-  async onAppHomeOpened({ context }) {
+  async onAppHomeOpened({context}) {
     const client = await this.clients.get(context);
 
     const view = {
@@ -84,6 +83,6 @@ export default class Picky {
       ],
     };
 
-    await client.views.publish({ user_id: context.userId, view: JSON.stringify(view) });
+    await client.views.publish({user_id: context.userId, view: JSON.stringify(view)});
   }
 }
