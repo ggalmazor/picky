@@ -11,14 +11,14 @@ describe('Brain', () => {
         new RandomAcronyms(deterministicRandom()),
         new VolatileMemory({ ABC: ['Agile Bouncy Coyote'] }),
       );
-      assertThat(await subject.getDefinitions('ABC'), equalTo(['Agile Bouncy Coyote']));
+      assertThat(await subject.getDefinitions({}, 'ABC'), equalTo(['Agile Bouncy Coyote']));
     });
 
     it('gets a definition from the acronyms source if unknown and remembers it', async () => {
       const subject = new Brain(new RandomAcronyms(deterministicRandom()), new VolatileMemory({}));
 
-      assertThat(await subject.getDefinitions('ABC'), equalTo(['Artistic Bizarre Cricket']));
-      assertThat(await subject.getDefinitions('ABC'), equalTo(['Artistic Bizarre Cricket']));
+      assertThat(await subject.getDefinitions({}, 'ABC'), equalTo(['Artistic Bizarre Cricket']));
+      assertThat(await subject.getDefinitions({}, 'ABC'), equalTo(['Artistic Bizarre Cricket']));
     });
   });
 
@@ -26,17 +26,17 @@ describe('Brain', () => {
     it('memorizes the provided acronym definition', async () => {
       const subject = new Brain(new RandomAcronyms(), new VolatileMemory({}));
 
-      await subject.learn('ABC', 'Agile Bouncy Coyote');
+      await subject.learn({}, 'ABC', 'Agile Bouncy Coyote');
 
-      assertThat(await subject.getDefinitions('ABC'), equalTo(['Agile Bouncy Coyote']));
+      assertThat(await subject.getDefinitions({}, 'ABC'), equalTo(['Agile Bouncy Coyote']));
     });
 
     it('prevents memorizing duplicates', async () => {
       const subject = new Brain(new RandomAcronyms(), new VolatileMemory({ ABC: ['Agile Bouncy Coyote'] }));
 
-      await subject.learn('ABC', 'Agile Bouncy Coyote');
+      await subject.learn({}, 'ABC', 'Agile Bouncy Coyote');
 
-      assertThat(await subject.getDefinitions('ABC'), equalTo(['Agile Bouncy Coyote']));
+      assertThat(await subject.getDefinitions({}, 'ABC'), equalTo(['Agile Bouncy Coyote']));
     });
   });
 
@@ -47,18 +47,18 @@ describe('Brain', () => {
         new VolatileMemory({ ABC: ['Agile Bouncy Coyote'] }),
       );
 
-      await subject.forget('ABC', 'Agile Bouncy Coyote');
+      await subject.forget({}, 'ABC', 'Agile Bouncy Coyote');
 
-      assertThat(await subject.getDefinitions('ABC'), equalTo(['Artistic Bizarre Cricket']));
+      assertThat(await subject.getDefinitions({}, 'ABC'), equalTo(['Artistic Bizarre Cricket']));
     });
 
     it('silently ignores unknown acronym definitions', async () => {
       const subject = new Brain(new RandomAcronyms(), new VolatileMemory({ ABC: ['Agile Bouncy Coyote'] }));
 
-      await subject.forget('ABC', 'Some other definition');
-      await subject.forget('DEF', 'Some other definition');
+      await subject.forget({}, 'ABC', 'Some other definition');
+      await subject.forget({}, 'DEF', 'Some other definition');
 
-      assertThat(await subject.getDefinitions('ABC'), equalTo(['Agile Bouncy Coyote']));
+      assertThat(await subject.getDefinitions({}, 'ABC'), equalTo(['Agile Bouncy Coyote']));
     });
   });
 });
