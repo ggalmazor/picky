@@ -7,7 +7,7 @@
   "scripts": {
     "db-setup": "NODE_ENV=${NODE_ENV:-development} node bin/setup-db.js",
     "start": "node src/index.js",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "linter": "eslint .",
     "linter-fix": "eslint --fix .",
     "format-fix": "prettier -w '*.{js,json}' '{bin,src,tests}/**/*.js'",
