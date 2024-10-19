@@ -12,7 +12,7 @@ const db = knex({
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
   },
-  pool: { min: 0, max: 4 },
+  pool: {min: 0, max: 4},
 });
 
 const app = new bolt.App({
@@ -25,17 +25,23 @@ const app = new bolt.App({
 const picky = await Picky.from(db, app);
 
 app.event('message', async (payload) => {
+  if (payload.event.bot_profile !== undefined)
+    return;
+
   if (payload.event.channel_type === 'im') return picky.onAppMention(payload, true);
 
-  return picky.onMessage(payload);
+  return picky.onMessage(payload).catch(error => app.logger.error(error.stack));
 });
 
 app.event('app_mention', async (payload) => {
-  return picky.onAppMention(payload);
+  if (payload.event.bot_profile !== undefined)
+    return;
+
+  return picky.onAppMention(payload).catch(error => app.logger.error(error.stack));
 });
 
 app.event('app_home_opened', async (payload) => {
-  return picky.onAppHomeOpened(payload);
+  return picky.onAppHomeOpened(payload).catch(error => app.logger.error(error.stack));
 });
 
 await app.start(process.env.PORT || 3000);

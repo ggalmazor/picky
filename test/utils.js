@@ -81,7 +81,7 @@ export const testSlackClient = () => new Proxy(
         {},
         {
           get(methods, name) {
-            methods[name] ||= () => {
+            methods[name] ||= async () => {
             };
             return methods[name];
           }
@@ -93,17 +93,21 @@ export const testSlackClient = () => new Proxy(
 );
 
 export function mockBootUpContext() {
+  const logger = new TestLogger();
   const app = {
     listeners: {},
     client: testSlackClient(),
-    logger: new TestLogger(),
+    logger: logger,
     start: jest.fn(),
+    receiver: {
+      routes: {}
+    },
     event(event, callback) {
       this.listeners[event] = callback
     },
-    sendEvent(event, payload) {
-      this.listeners[event].call(null, payload);
-    }
+    async sendEvent(event, payload) {
+      await this.listeners[event].call(null, payload);
+    },
   };
   const BoltApp = jest.fn().mockImplementation(() => app);
   jest.unstable_mockModule('@slack/bolt', () => ({
@@ -119,11 +123,12 @@ export function mockBootUpContext() {
   }))
 
   const picky = {
-    onMessage: jest.fn(),
-    onAppMention: jest.fn(),
+    onMessage: jest.fn().mockResolvedValue(),
+    onAppMention: jest.fn().mockResolvedValue(),
+    onAppHomeOpened: jest.fn().mockResolvedValue()
   }
   Picky.from = jest.fn().mockResolvedValue(picky);
 
-  return {app, BoltApp, db, knex, picky};
+  return {app, BoltApp, db, knex, logger, picky};
 }
 
