@@ -20,8 +20,10 @@ Picky will add a ✅ reaction when it's done and it will use it along with any o
 
 You can make Picky forget acronym definitions:
 ```
-@picky forget <acronym> <definition>
+@picky forget <acronym> [definition]
 ```
+
+If no `definition` is provided, then Picky will forget the acronym along with any existing definitions. 
 
 Picky will add a ✅ reaction when it's done and it will stop using it along when explaining the acronym.
 
