@@ -23,7 +23,7 @@ Thank you for using (nit)Picky. This privacy policy explains how we collect, use
 We use the information collected in the following ways:
 
 - To respond to your commands, such as defining acronyms or learning new definitions.
-- To improve the app’s functionality and user experience.
+- To improve the app's functionality and user experience.
 - For troubleshooting and maintenance (logging only when necessary for resolving bugs).
 
 ## Data Retention
@@ -42,7 +42,7 @@ We take appropriate security measures to protect your information from unauthori
 
 You have the right to:
 
-- Request the deletion of specific acronyms or definitions using the app’s forget command.
+- Request the deletion of specific acronyms or definitions using the app's forget command.
 - Contact us for inquiries or concerns about the handling of your data.
 
 ## Changes to This Policy
@@ -51,4 +51,4 @@ We may update this privacy policy periodically to reflect changes in our practic
 
 ## Contact Us
 
-If you have any questions or concerns about this privacy policy, please contact us at [https://github.com/ggalmazor/picky/issues](https://github.com/ggalmazor/picky/issues).
+If you have any questions or concerns about this privacy policy, please contact us at guille@sendia.org.
