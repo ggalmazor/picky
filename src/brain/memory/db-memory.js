@@ -1,4 +1,4 @@
-export function buildTeamSlackId(slackEnterpriseId, slackTeamId) {
+export function buildSlackId(slackEnterpriseId, slackTeamId) {
   if (slackEnterpriseId === undefined)
     return `_.${slackTeamId}`;
 
@@ -7,58 +7,58 @@ export function buildTeamSlackId(slackEnterpriseId, slackTeamId) {
 
 // noinspection EqualityComparisonWithCoercionJS
 export default class DbMemory {
-  constructor(db, teamId) {
+  constructor(db) {
     this.db = db;
-    this.teamId = teamId;
   }
 
-  static async from(db, team, enterprise) {
-    const teamSlackId = buildTeamSlackId(enterprise?.id, team.id);
-    let teamId;
-    if (enterprise?.id === undefined) {
-      teamId = (await db('teams').select("id").where({slack_id: teamSlackId}).first()).id;
-    } else {
-      const result = await db('teams')
-        .join("enterprises", "enterprises.id", "teams.enterprise_id")
-        .select("teams.id")
-        .where("teams.slack_id", teamSlackId)
-        .where("enterprises.slack_id", enterprise.id)
-        .first();
-      if (result === undefined)
-        throw new Error(`Team ${teamSlackId} not found`);
+  static async setUpTeam(db, {id: slackTeamId, name: teamName}, {id: slackEnterpriseId, name: enterpriseName}, accessToken) {
+    const slackId = buildSlackId(slackEnterpriseId, slackTeamId);
 
-      teamId = result.id;
-    }
-    return new DbMemory(db, teamId);
-  }
-
-  static async setUpTeam(db, team, accessToken, enterprise) {
-    const teamSlackId = buildTeamSlackId(enterprise?.id, team.id);
-    const teamExists = (await db('teams').count('id', {as: 'count'}).where({slack_id: teamSlackId}).first()).count == 1;
+    const teamExists = (await db('teams').count('id', {as: 'count'}).where({slack_id: slackId}).first()).count == 1;
     if (teamExists) {
       if (accessToken !== undefined)
-        await db('teams').update({access_token: accessToken}).where({slack_id: teamSlackId});
+        await db('teams').update({access_token: accessToken}).where({slack_id: slackId});
       return;
     }
 
-    if (enterprise?.id !== undefined) {
-      const enterpriseId = (await db('enterprises').returning("id").insert({slack_id: enterprise.id, name: enterprise.name}))[0].id;
-      await db('teams').insert({enterprise_id: enterpriseId, slack_id: teamSlackId, name: team.name, access_token: accessToken})
+    if (slackEnterpriseId !== undefined) {
+      const enterpriseId = (await db('enterprises').returning("id").insert({
+        slack_id: slackEnterpriseId,
+        name: enterpriseName
+      }))[0].id;
+      await db('teams').insert({
+        enterprise_id: enterpriseId,
+        slack_id: slackId,
+        name: teamName,
+        access_token: accessToken
+      })
     } else {
       await db('teams').insert({
-        slack_id: teamSlackId,
-        name: team.name,
+        slack_id: slackId,
+        name: teamName,
         access_token: accessToken
       })
     }
   }
 
-  async knows(acronym, definition) {
+  async teamId({enterpriseId, teamId}) {
+    const slackId = buildSlackId(enterpriseId, teamId);
+    const result = await this.db('teams').select("id").where({slack_id: slackId}).first();
+
+    if (result === undefined)
+      throw new Error(`Team ${slackId} not found`);
+
+    return result.id;
+  }
+
+  async knows(context, acronym, definition) {
+    const teamId = await this.teamId(context);
+
     if (definition === undefined) {
       const exists = (
         await this.db('acronyms')
           .count('acronyms.id', {as: 'exists'})
-          .where('team_id', this.teamId)
+          .where('team_id', teamId)
           .where('acronym', acronym)
           .first()
       ).exists;
@@ -69,7 +69,7 @@ export default class DbMemory {
       await this.db('acronyms')
         .count('acronyms.id', {as: 'exists'})
         .join('definitions', 'acronyms.id', 'acronym_id')
-        .where('team_id', this.teamId)
+        .where('team_id', teamId)
         .where('acronym', acronym)
         .where('definition', definition)
         .first()
@@ -77,26 +77,30 @@ export default class DbMemory {
     return exists == 1;
   }
 
-  async recall(acronym) {
+  async recall(context, acronym) {
+    const teamId = await this.teamId(context);
+
     const results = await this.db('definitions')
       .join('acronyms', 'acronyms.id', 'definitions.acronym_id')
       .select('definition')
-      .where('team_id', this.teamId)
+      .where('team_id', teamId)
       .where('acronym', acronym)
       .orderBy('definition');
     return results.map((result) => result.definition);
   }
 
-  async learn(acronym, definition) {
+  async learn(context, acronym, definition) {
+    const teamId = await this.teamId(context);
+
     let acronymId;
     const result = await this.db('acronyms')
       .select('acronyms.id')
-      .where('team_id', this.teamId)
+      .where('team_id', teamId)
       .where('acronym', acronym)
       .first();
     if (result === undefined) {
       acronymId = (
-        await this.db('acronyms').returning('acronyms.id').insert({team_id: this.teamId, acronym: acronym})
+        await this.db('acronyms').returning('acronyms.id').insert({team_id: teamId, acronym: acronym})
       )[0].id;
     } else {
       acronymId = result.id;
@@ -108,10 +112,12 @@ export default class DbMemory {
       .insert({acronym_id: acronymId, definition: definition});
   }
 
-  async forget(acronym, definition) {
+  async forget(context, acronym, definition) {
+    const teamId = await this.teamId(context);
+
     const result = await this.db('acronyms')
       .select('acronyms.id')
-      .where('team_id', this.teamId)
+      .where('team_id', teamId)
       .where('acronym', acronym)
       .first();
     if (result === undefined) return;
