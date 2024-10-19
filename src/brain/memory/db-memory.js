@@ -13,36 +13,6 @@ export default class DbMemory {
     this.db = db;
   }
 
-  static async setUpTeam(db, {id: slackTeamId, name: teamName}, {id: slackEnterpriseId, name: enterpriseName}, accessToken) {
-    const slackId = buildSlackId(slackEnterpriseId, slackTeamId);
-
-    const teamExists = (await db('teams').count('id', {as: 'count'}).where({slack_id: slackId}).first()).count == 1;
-    if (teamExists) {
-      if (accessToken !== undefined)
-        await db('teams').update({access_token: accessToken}).where({slack_id: slackId});
-      return;
-    }
-
-    if (slackEnterpriseId !== undefined) {
-      const enterpriseId = (await db('enterprises').returning("id").insert({
-        slack_id: slackEnterpriseId,
-        name: enterpriseName
-      }))[0].id;
-      await db('teams').insert({
-        enterprise_id: enterpriseId,
-        slack_id: slackId,
-        name: teamName,
-        access_token: accessToken
-      })
-    } else {
-      await db('teams').insert({
-        slack_id: slackId,
-        name: teamName,
-        access_token: accessToken
-      })
-    }
-  }
-
   async teamId({enterpriseId, teamId}) {
     const slackId = buildSlackId(enterpriseId, teamId);
     const result = await this.db('teams').select("id").where({slack_id: slackId}).first();
