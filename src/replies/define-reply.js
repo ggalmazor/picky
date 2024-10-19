@@ -1,8 +1,9 @@
 const acronymMatcher = () => /\b([A-Z]{2,5})\b/g;
 
 export default class DefineReply {
-  constructor(brain, logger) {
+  constructor(brain, clients, logger) {
     this.brain = brain;
+    this.clients = clients;
     this.logger = logger;
   }
 
@@ -10,16 +11,17 @@ export default class DefineReply {
     return acronymMatcher().test(event.text);
   }
 
-  async accept(event, say) {
+  async accept(context, event) {
+    const client = await this.clients.get(context);
     const acronyms = [...event.text.matchAll(acronymMatcher())].map((a) => a[0]);
     await Promise.all(
       acronyms.map(async (acronym) => {
-        const definitions = await this.brain.getDefinitions(acronym);
+        const definitions = await this.brain.getDefinitions(context, acronym);
         const text =
           definitions.length === 1
             ? `${acronym} stands for: \`${definitions[0]}\``
             : `${acronym} stands for:\n\`\`\`\n${definitions.join('\n')}\n\`\`\``;
-        return say(text).catch((error) => this.logger.error(error));
+        return client.chat.postMessage({channel: event.channel, text});
       }),
     );
   }
