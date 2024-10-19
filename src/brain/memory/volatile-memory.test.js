@@ -1,5 +1,5 @@
 import VolatileMemory from './volatile-memory.js';
-import { assertThat, before, equalTo, is } from 'hamjest';
+import { assertThat, equalTo, is } from 'hamjest';
 
 describe('Volatile memory', () => {
   let subject;

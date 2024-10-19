@@ -4,7 +4,6 @@ import { assertThat, equalTo, instanceOf, is, isRejectedWith, promiseThat } from
 import knex from 'knex';
 import profiles from '../../../knexfile.js';
 import { TeamNeedsSetUpError } from '../../errors/errors.js';
-import VolatileMemory from './volatile-memory.js';
 
 describe('Database memory', () => {
   let db;
