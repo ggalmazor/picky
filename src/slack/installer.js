@@ -1,4 +1,4 @@
-import {buildSlackId} from '../brain/memory/db-memory.js';
+import { buildSlackId } from '../brain/memory/db-memory.js';
 
 export default class Installer {
   constructor(db, clients) {
@@ -16,34 +16,31 @@ export default class Installer {
   }
 
   async #getTeamUrl(enterprise, team) {
-    const client = await this.clients.get({enterpriseId: enterprise?.id, teamId: team.id});
+    const client = await this.clients.get({ enterpriseId: enterprise?.id, teamId: team.id });
     const teamInfo = await client.team.info();
     return teamInfo.team.url;
   }
 
   async #setUpTeam(enterprise, team, accessToken) {
-    const {id: slackEnterpriseId, name: enterpriseName} = enterprise || {};
-    const {id: slackTeamId, name: teamName} = team || {};
+    const { id: slackEnterpriseId, name: enterpriseName } = enterprise || {};
+    const { id: slackTeamId, name: teamName } = team || {};
     const slackId = buildSlackId(slackEnterpriseId, slackTeamId);
 
     const teamExists =
-      (await this.db('teams').count('id', {as: 'count'}).where({slack_id: slackId}).first()).count == 1;
+      (await this.db('teams').count('id', { as: 'count' }).where({ slack_id: slackId }).first()).count == 1;
     if (teamExists) {
       if (accessToken !== undefined)
-        await this.db('teams').update({access_token: accessToken}).where({slack_id: slackId});
+        await this.db('teams').update({ access_token: accessToken }).where({ slack_id: slackId });
       return;
     }
 
     if (slackEnterpriseId !== undefined) {
       await this.db('enterprises')
-        .insert({slack_id: slackEnterpriseId, name: enterpriseName})
+        .insert({ slack_id: slackEnterpriseId, name: enterpriseName })
         .onConflict(['slack_id'])
         .ignore();
 
-      const enterpriseId = (await this.db('enterprises')
-        .select('id')
-        .where('slack_id', slackEnterpriseId)
-        .first()).id;
+      const enterpriseId = (await this.db('enterprises').select('id').where('slack_id', slackEnterpriseId).first()).id;
 
       await this.db('teams').insert({
         enterprise_id: enterpriseId,
