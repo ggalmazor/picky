@@ -84,7 +84,7 @@ describe('Volatile memory', () => {
     });
   });
 
-  describe('ignore & isIgnored', () => {
+  describe('ignore, isIgnored & stopIgnoring', () => {
     beforeEach(() => {
       subject = new VolatileMemory();
     });
@@ -94,6 +94,10 @@ describe('Volatile memory', () => {
 
       assertThat(await subject.isIgnored({}, 'ABC'), is(true));
       assertThat(await subject.isIgnored({}, 'DEF'), is(false));
+
+      await subject.stopIgnoring({}, 'ABC');
+
+      assertThat(await subject.isIgnored({}, 'ABC'), is(false));
     });
   });
 });

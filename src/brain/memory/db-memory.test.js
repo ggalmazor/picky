@@ -221,5 +221,23 @@ describe('Database memory', () => {
     it("returns false if there's no row for the provided acronym", async () => {
       assertThat(await subject.isIgnored(context, 'ABC'), is(false));
     });
-  })
+  });
+
+  describe('stopIgnoring', () => {
+    it('sets the ignored flag to false on the provided acronym', async () => {
+      await db('acronyms').insert({team_id: teamId, acronym: 'ABC', ignored: true});
+
+      await subject.stopIgnoring(context, 'ABC');
+
+      const isIgnored = (await db('acronyms').select('ignored').where('acronym', 'ABC').first()).ignored;
+      assertThat(isIgnored, is(false));
+    });
+
+    it("creates an acronym row to remember the preference if the acronym doesn't exist", async () => {
+      await subject.stopIgnoring(context, 'ABC');
+
+      const isIgnored = (await db('acronyms').select('ignored').where('acronym', 'ABC').first()).ignored;
+      assertThat(isIgnored, is(false));
+    });
+  });
 });

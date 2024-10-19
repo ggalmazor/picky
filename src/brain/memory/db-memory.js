@@ -135,4 +135,13 @@ export default class DbMemory {
 
     return result?.ignored || false;
   }
+
+  async stopIgnoring(context, acronym) {
+    const teamId = await this.teamId(context);
+
+    await this.db('acronyms')
+      .insert({team_id: teamId, acronym: acronym, ignored: false})
+      .onConflict(['team_id', 'acronym'])
+      .merge();
+  }
 }
