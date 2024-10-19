@@ -18,16 +18,17 @@ describe('DefineReply', () => {
   });
 
   describe('apply', () => {
-    let brain, client, logger, subject;
+    let brain, memory, client, logger, subject;
     let context, event;
 
     beforeEach(() => {
+      memory = new VolatileMemory({
+        HTML: ['Hyper Text Markup Language'],
+        API: ['Application Programming Interface'],
+      });
       brain = new Brain(
         new RandomAcronyms(),
-        new VolatileMemory({
-          HTML: ['Hyper Text Markup Language'],
-          API: ['Application Programming Interface'],
-        }),
+        memory,
       );
       client = testSlackClient();
       logger = new TestLogger();
@@ -87,6 +88,31 @@ describe('DefineReply', () => {
         expect(spy).toHaveBeenCalledWith({
           channel: event.channel,
           text: 'HTML stands for:\n```\nHyper Text Markup Language\nHow To Make Lasagna\n```',
+        });
+      });
+    });
+
+    describe('when an acronym in the message is ignored', () => {
+      beforeEach(async () => {
+        await memory.ignore({}, 'API');
+      });
+
+      it("doesn't define it", async () => {
+        const spy = jest.spyOn(brain, 'getDefinitions');
+
+        await subject.accept(context, event);
+
+        expect(spy).not.toHaveBeenCalledWith(context, 'API');
+      });
+
+      it("doesn't post a chat message for it", async () => {
+        const spy = jest.spyOn(client.chat, 'postMessage');
+
+        await subject.accept(context, event);
+
+        expect(spy).not.toHaveBeenCalledWith({
+          channel: event.channel,
+          text: expect.stringContaining('API')
         });
       });
     });
