@@ -18,7 +18,8 @@ describe('DefineCommand', () => {
   });
 
   describe('apply', () => {
-    let brain, client, logger, say, subject;
+    let brain, client, logger, subject;
+    let context, event;
 
     beforeEach(() => {
       brain = new Brain(
@@ -29,35 +30,45 @@ describe('DefineCommand', () => {
       );
       client = testSlackClient();
       logger = new TestLogger();
-      subject = new DefineCommand(brain, client, logger);
-      say = jest.fn().mockResolvedValue();
+      subject = new DefineCommand(brain, {async get() { return client; }}, logger);
+
+      context = {};
+      event = { channel: 'C07QK0MHHKM', text: '@Picky define API' };
     });
 
     it('uses the brain to get acronym definitions', async () => {
       const spy = jest.spyOn(brain, 'getDefinitions');
 
-      await subject.accept({ text: '@Picky define API' }, say);
+      await subject.accept(context, event);
 
-      expect(spy).toHaveBeenCalledWith('API');
+      expect(spy).toHaveBeenCalledWith(context, 'API');
     });
 
-    it('Uses the event `say` function to reply with the definition', async () => {
-      await subject.accept({ text: '@Picky define API' }, say);
+    it('Uses a Slack client to post a chat message with the definition in a single line', async () => {
+      const spy = jest.spyOn(client.chat, 'postMessage');
 
-      expect(say).toHaveBeenCalledWith('API stands for: `Application Programming Interface`');
+      await subject.accept(context, event);
+
+      expect(spy).toHaveBeenCalledWith({
+        channel: event.channel,
+        text: 'API stands for: `Application Programming Interface`'
+      });
     });
 
     describe('when the brain knows multiple definitions', () => {
       beforeEach(() => {
-        brain.learn('API', 'Apple Pie Inside');
+        brain.learn(context, 'API', 'Apple Pie Inside');
       });
 
-      it('Uses the event `say` function to reply in a single line', async () => {
-        await subject.accept({ text: '@Picky define API' }, say);
+      it('Uses a Slack client to post a chat message with the definitions in a code block', async () => {
+        const spy = jest.spyOn(client.chat, 'postMessage');
 
-        expect(say).toHaveBeenCalledWith(
-          'API stands for:\n```\nApplication Programming Interface\nApple Pie Inside\n```',
-        );
+        await subject.accept(context, event);
+
+        expect(spy).toHaveBeenCalledWith({
+          channel: event.channel,
+          text: 'API stands for:\n```\nApplication Programming Interface\nApple Pie Inside\n```'
+        });
       });
     });
   });

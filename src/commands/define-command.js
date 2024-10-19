@@ -3,9 +3,9 @@ function defineCommandMatcher() {
 }
 
 export default class DefineCommand {
-  constructor(brain, client, logger) {
+  constructor(brain, clients, logger) {
     this.brain = brain;
-    this.client = client;
+    this.clients = clients;
     this.logger = logger;
   }
 
@@ -13,14 +13,15 @@ export default class DefineCommand {
     return defineCommandMatcher().test(event.text);
   }
 
-  async accept(event, say) {
+  async accept(context, event) {
+    const client = await this.clients.get(context);
     const [, acronym] = event.text.match(defineCommandMatcher());
 
-    const definitions = await this.brain.getDefinitions(acronym);
+    const definitions = await this.brain.getDefinitions(context, acronym);
     const text =
       definitions.length === 1
         ? `${acronym} stands for: \`${definitions[0]}\``
         : `${acronym} stands for:\n\`\`\`\n${definitions.join('\n')}\n\`\`\``;
-    return say(text).catch((error) => this.logger.error(error));
+    await client.chat.postMessage({ channel: event.channel, text });
   }
 }
