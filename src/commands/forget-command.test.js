@@ -11,6 +11,9 @@ describe('ForgetCommand', () => {
       assertThat(ForgetCommand.test({ text: '@Picky forget API Application Programming Interface' }), is(true));
       assertThat(ForgetCommand.test({ text: '<@U07Q4GM0KSB> forget API Application Programming Interface' }), is(true));
       assertThat(ForgetCommand.test({ text: 'forget API Application Programming Interface' }), is(true));
+      assertThat(ForgetCommand.test({ text: '@Picky forget API' }), is(true));
+      assertThat(ForgetCommand.test({ text: '<@U07Q4GM0KSB> forget API' }), is(true));
+      assertThat(ForgetCommand.test({ text: 'forget API' }), is(true));
     });
   });
 
