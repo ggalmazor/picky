@@ -5,9 +5,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "setup-db-development": "node bin/setup-db.js development",
-    "setup-db-test": "node bin/setup-db.js test",
-    "setup-db-production": "node bin/setup-db.js production",
+    "db-setup": "NODE_ENV=${NODE_ENV:-development} node bin/setup-db.js",
     "start": "node src/index.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles",
     "linter": "eslint .",

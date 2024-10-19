@@ -16,7 +16,7 @@ async function createDatabase(profile) {
     console.log(`✅ Database ${profile.connection.database} created`)
   } catch (error) {
     if (error.message.includes(`database "${profile.connection.database}" already exists`)) {
-      console.log(`ℹ️ Database ${profile.connection.database} already exists`);
+      console.log(`ℹ️Database ${profile.connection.database} already exists`);
     } else {
       throw error;
     }
@@ -35,7 +35,9 @@ async function runMigrations(profile) {
   await db.destroy();
 }
 
-const environment = process.argv[2];
+const environment = process.env.NODE_ENV;
+
+console.log(`Setting up DB for env: ${environment}`);
 
 if (!(environment in profiles))
   throw new Error(`No profile for ${environment} environment`);
