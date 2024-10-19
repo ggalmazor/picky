@@ -3,6 +3,7 @@ import { mockBootUpContext } from '../test/utils.js';
 import { allOf, assertThat, containsString, hasItem, hasProperty, is, not, startsWith, undefined } from 'hamjest';
 import SlackClients from './slack/clients.js';
 import Picky from './picky/picky.js';
+import {LogLevel} from "@slack/web-api";
 
 async function withEnv(envEntries, block) {
   const originalEnv = process.env;
@@ -67,6 +68,7 @@ describe('Boot up script (index)', () => {
             token: 'SLACK_BOT_TOKEN',
             socketMode: false,
             appToken: 'SLACK_APP_TOKEN',
+            logLevel: LogLevel.DEBUG,
           });
         },
       );
@@ -89,6 +91,7 @@ describe('Boot up script (index)', () => {
               token: 'SLACK_BOT_TOKEN',
               socketMode: true,
               appToken: 'SLACK_APP_TOKEN',
+              logLevel: LogLevel.DEBUG,
             });
           },
         );
