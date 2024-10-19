@@ -71,6 +71,15 @@ app.receiver.routes = {
       res.end(`Success! You will now be redirected to ${redirectUrl}`);
     },
   },
+  '/install': {
+    GET: async (req, res) => {
+      res.writeHead(302, {
+        Location:
+          'https://slack.com/oauth/v2/authorize?client_id=7828417850918.7820563959399&scope=app_mentions:read,channels:history,chat:write,im:history,im:write,reactions:write,team:read&user_scope=',
+      });
+      res.end('');
+    },
+  },
 };
 
 await app.start(process.env.PORT || 3000);
