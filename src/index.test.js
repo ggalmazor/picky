@@ -1,7 +1,7 @@
 import {v4 as uuid} from 'uuid';
 import Picky from '../src/picky/picky.js';
 import {mockBootUpContext} from '../test/utils.js';
-import {allOf, assertThat, containsString, hasItem, startsWith} from 'hamjest';
+import {allOf, assertThat, containsString, hasItem, hasProperty, is, not, startsWith, undefined} from 'hamjest';
 
 async function withEnv(envEntries, block) {
   const originalEnv = process.env;
@@ -16,7 +16,7 @@ async function withEnv(envEntries, block) {
 }
 
 describe('Boot up script (index)', () => {
-  const { app, BoltApp, db, knex, logger, picky } = mockBootUpContext();
+  const {app, BoltApp, db, knex, logger, picky, slackOAuth, installer} = mockBootUpContext();
 
   afterEach(async () => {
     jest.clearAllMocks();
@@ -195,6 +195,61 @@ describe('Boot up script (index)', () => {
         startsWith("Error: Boom!\n"),
         containsString("at Object.<anonymous>")
       )));
+    });
+  });
+
+  describe('sets up OAuth installations', () => {
+    let req, res;
+
+    beforeEach(() => {
+      req = {
+        url: '/foo?bar=33&code=some%20code&baz=44'
+      };
+      res = {
+        writeHead: jest.fn(),
+        end: jest.fn()
+      };
+    })
+    it('sets up a custom route to deal with OAuth installations', async () => {
+      await import(`./../src/index.js?randomizer=${uuid()}`);
+
+      assertThat(app.receiver.routes, hasProperty("/oauth", hasProperty("GET", is(not(undefined())))))
+    });
+
+    it('exchanges the received code for an access token', async () => {
+      req = {
+        url: `/foo?${new URLSearchParams({code: 'some code'}).toString()}`
+      };
+
+      await import(`./../src/index.js?randomizer=${uuid()}`);
+
+      await app.receiver.routes["/oauth"]["GET"](req, res);
+
+      expect(slackOAuth.access).toHaveBeenCalledWith("some code");
+    });
+
+    it('completes the installation of the app for the received team', async () => {
+      const accessToken = "some token";
+      const team = {id: "team ID", name: 'team name'};
+      const enterprise = {id: 'enterprise ID', name: 'enterprise name'}
+      slackOAuth.access.mockResolvedValue({accessToken, team, enterprise});
+
+      await import(`./../src/index.js?randomizer=${uuid()}`);
+
+      await app.receiver.routes["/oauth"]["GET"](req, res);
+
+      expect(installer.completeInstallation).toHaveBeenCalledWith(team, enterprise, accessToken);
+    });
+
+    it("responds with an HTTP 302 targeting the team's Slack URL", async () => {
+      installer.completeInstallation.mockResolvedValue("https://foo.slack.com");
+
+      await import(`./../src/index.js?randomizer=${uuid()}`);
+
+      await app.receiver.routes["/oauth"]["GET"](req, res);
+
+      expect(res.writeHead).toHaveBeenCalledWith(302, {"Location": "https://foo.slack.com"});
+      expect(res.end).toHaveBeenCalledWith('Success! You will now be redirected to https://foo.slack.com');
     });
   });
 

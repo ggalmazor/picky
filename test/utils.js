@@ -1,4 +1,5 @@
 import Picky from "../src/picky/picky.js";
+import Installer from "../src/slack/installer.js";
 
 const RANDOM_NUMBERS = [
   0.43131150217673775, 0.8812124484754995, 0.7065464533465053,
@@ -74,20 +75,20 @@ export class TestLogger {
 export const testSlackClient = () => new Proxy(
   {},
   {
-    get(proxies, name) {
-      if (proxies[name] !== undefined) return proxies[name];
+    get(proxies, level1name) {
+      if (proxies[level1name] !== undefined) return proxies[level1name];
 
-      proxies[name] = new Proxy(
+      proxies[level1name] = new Proxy(
         {},
         {
-          get(methods, name) {
-            methods[name] ||= async () => {
+          get(methods, level2name) {
+            methods[level2name] ||= level1name === 'oauth' ? testSlackClient() : async () => {
             };
-            return methods[name];
+            return methods[level2name];
           }
         }
       );
-      return proxies[name];
+      return proxies[level1name];
     }
   }
 );
@@ -129,6 +130,30 @@ export function mockBootUpContext() {
   }
   Picky.from = jest.fn().mockResolvedValue(picky);
 
-  return {app, BoltApp, db, knex, logger, picky};
+  const slackOAuth = {
+    access: jest.fn().mockResolvedValue({
+      access_token: 'some token',
+      team: {
+        id: "team ID",
+        name: 'team name'
+      },
+      enterprise: {
+        id: 'enterprise ID',
+        name: 'enterprise name'
+      }
+    })
+  };
+
+  jest.unstable_mockModule('../src/slack/oauth', () => ({
+    default: jest.fn().mockImplementation(() => slackOAuth)
+  }));
+
+  const installer = {
+    completeInstallation: jest.fn().mockResolvedValue("https://foo.slack.com")
+  };
+
+  Installer.from = jest.fn().mockReturnValue(installer);
+
+  return {app, BoltApp, db, knex, logger, picky, slackOAuth, installer};
 }
 

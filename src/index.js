@@ -2,6 +2,8 @@ import 'dotenv/config';
 import bolt from '@slack/bolt';
 import knex from 'knex';
 import Picky from './picky/picky.js';
+import SlackOAuth from "./slack/oauth.js";
+import Installer from "./slack/installer.js";
 
 const db = knex({
   client: 'postgresql',
@@ -23,6 +25,11 @@ const app = new bolt.App({
 });
 
 const picky = await Picky.from(db, app);
+const slackOAuth = new SlackOAuth(app.client, {
+  CLIENT_ID: process.env.CLIENT_ID,
+  CLIENT_SECRET: process.env.CLIENT_SECRET,
+});
+const installer = Installer.from(picky);
 
 app.event('message', async (payload) => {
   if (payload.event.bot_profile !== undefined)
@@ -43,6 +50,22 @@ app.event('app_mention', async (payload) => {
 app.event('app_home_opened', async (payload) => {
   return picky.onAppHomeOpened(payload).catch(error => app.logger.error(error.stack));
 });
+
+app.receiver.routes = {
+  "/oauth": {
+    "GET": async (req, res) => {
+      const url = new URL(`https://example.com${req.url}`);
+      const code = url.searchParams.get('code');
+
+      const {team, enterprise, accessToken} = await slackOAuth.access(code);
+
+      const redirectUrl = await installer.completeInstallation(team, enterprise, accessToken);
+
+      res.writeHead(302, {"Location": redirectUrl});
+      res.end(`Success! You will now be redirected to ${redirectUrl}`);
+    }
+  }
+};
 
 await app.start(process.env.PORT || 3000);
 app.logger.info('⚡️ Bolt app is running!');
