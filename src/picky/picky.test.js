@@ -5,7 +5,7 @@ import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 import Replies from '../replies/replies.js';
 import Commands from '../commands/commands.js';
 import VolatileMemory from '../brain/memory/volatile-memory.js';
-import {allOf, assertThat, empty, hasItem, instanceOf, is, not} from 'hamjest';
+import {assertThat, before, empty, hasItem, instanceOf, is, not} from 'hamjest';
 import {v4 as uuid} from 'uuid';
 import knex from 'knex';
 import profiles from '../../knexfile.js';
@@ -51,20 +51,6 @@ describe('Picky.from(...) factory', () => {
     db.destroy();
   });
 
-  it("gets the team's info using the app's client", async () => {
-    await Picky.from(db, app);
-
-    expect(app.client.team.info).toHaveBeenCalled();
-  });
-
-  it("sets up the team", async () => {
-    const spy = jest.spyOn(DbMemory, "setUpTeam");
-
-    await Picky.from(db, app);
-
-    expect(spy).toHaveBeenCalledWith(db, team);
-  });
-
   it('configures the dependencies tree and returns a new Picky instance', async () => {
     const subject = await Picky.from(db, app);
 
@@ -80,11 +66,9 @@ describe('Picky.from(...) factory', () => {
 });
 
 describe('Picky', () => {
-  let brain, client, logger, replies, commands, say, subject, payload;
-
-  function buildPayload(text = 'foo bar baz', botUserId = 'U07QZFMN8MU') {
-    return {event: {text}, context: {botUserId}, say};
-  }
+  let brain, client, logger, replies, commands;
+  let subject;
+  let context, event, payload;
 
   beforeEach(() => {
     brain = new Brain(
@@ -94,16 +78,24 @@ describe('Picky', () => {
         API: ['Application Programming Interface'],
       }),
     );
-    logger = new TestLogger();
     client = testSlackClient();
+    logger = new TestLogger();
     replies = new Replies([], brain, logger);
     commands = new Commands([], brain, client, logger);
-    say = jest.fn().mockResolvedValue();
-    payload = buildPayload('foo bar baz');
-    subject = new Picky(brain, replies, commands, client, logger);
+    subject = new Picky(brain, replies, commands, {
+      async get() {
+        return client;
+      }
+    }, logger);
   });
 
   describe('onMessage', () => {
+    beforeEach(async () => {
+      context = {};
+      event = {type: "message", channel: 'C07QK0MHHKM', text: "Some message", ts: 1728412412};
+      payload = {event, context};
+    });
+
     describe("when there's a Reply for the message", () => {
       let Reply, replySpy;
 
@@ -115,31 +107,13 @@ describe('Picky', () => {
       it('logs an info message', async () => {
         await subject.onMessage(payload);
 
-        assertThat(logger.messages.info, hasItem(`Replying to message: ${payload.event.text}`));
+        assertThat(logger.messages.info, hasItem(`Replying to message: ${event.text}`));
       });
 
       it('executes the Reply', async () => {
         await subject.onMessage(payload);
 
-        expect(replySpy).toHaveBeenCalledWith({text: payload.event.text}, say);
-      });
-
-      describe('when the message includes a mention to Picky', () => {
-        beforeEach(() => {
-          payload = buildPayload('<BOTUSERID> foo bar baz', 'BOTUSERID');
-        });
-
-        it('logs a debug message', async () => {
-          await subject.onMessage(payload);
-
-          assertThat(logger.messages.debug, hasItem(`Ignoring message with mention: ${payload.event.text}`));
-        });
-
-        it("doesn't execute the Reply", async () => {
-          await subject.onMessage(payload);
-
-          expect(replySpy).not.toHaveBeenCalled();
-        });
+        expect(replySpy).toHaveBeenCalledWith(context, event);
       });
     });
 
@@ -147,50 +121,45 @@ describe('Picky', () => {
       it('logs a debug message', async () => {
         await subject.onMessage(payload);
 
-        assertThat(logger.messages.debug, hasItem(`No reply for: ${payload.event.text}`));
+        assertThat(logger.messages.debug, hasItem(`No reply for: ${event.text}`));
       });
 
       it("doesn't send any reply message", async () => {
+        const spy = jest.spyOn(client.chat, 'postMessage')
+
         await subject.onMessage(payload);
 
-        expect(say).not.toHaveBeenCalled();
+        expect(spy).not.toHaveBeenCalled();
       });
 
       describe('when `true` is provided in the `replyAll` param', () => {
         it("doesn't log a debug message", async () => {
           await subject.onMessage(payload, true);
 
-          assertThat(logger.messages.debug, not(hasItem(`No reply for: ${payload.event.text}`)));
+          assertThat(logger.messages.debug, not(hasItem(`No reply for: ${event.text}`)));
         });
 
         it("replies informing that it doesn't know how to reply to the message", async () => {
+          const spy = jest.spyOn(client.chat, 'postMessage')
+
           await subject.onMessage(payload, true);
 
-          expect(say).toHaveBeenCalledWith(`I don't know how to reply to: \`${payload.event.text}\``);
-        });
-      });
-
-      describe('when the message includes a mention to Picky', () => {
-        beforeEach(() => {
-          payload = buildPayload('<BOTUSERID> foo bar baz', 'BOTUSERID');
-        });
-
-        it('logs a different debug message', async () => {
-          await subject.onMessage(payload);
-
-          assertThat(
-            logger.messages.debug,
-            allOf(
-              not(hasItem(`No reply for: ${payload.event.text}`)),
-              hasItem(`Ignoring message with mention: ${payload.event.text}`),
-            ),
-          );
+          expect(spy).toHaveBeenCalledWith({
+            channel: event.channel,
+            text: `I don't know how to reply to: \`${event.text}\``
+          });
         });
       });
     });
   });
 
   describe('onAppMention', () => {
+    beforeEach(async () => {
+      context = {};
+      event = {type: "app_mention", channel: 'C07QK0MHHKM', text: "@Picky do something", ts: 1728412412};
+      payload = {event, context};
+    });
+
     describe("when there's a Command for the message", () => {
       let Command, commandSpy;
 
@@ -202,13 +171,13 @@ describe('Picky', () => {
       it('logs an info message', async () => {
         await subject.onAppMention(payload);
 
-        assertThat(logger.messages.info, hasItem(`Replying to mention: ${payload.event.text}`));
+        assertThat(logger.messages.info, hasItem(`Replying to mention: ${event.text}`));
       });
 
       it('executes the Reply', async () => {
         await subject.onAppMention(payload);
 
-        expect(commandSpy).toHaveBeenCalledWith({text: payload.event.text}, say);
+        expect(commandSpy).toHaveBeenCalledWith(context, event);
       });
     });
 
@@ -216,28 +185,54 @@ describe('Picky', () => {
       it('logs a debug message', async () => {
         await subject.onAppMention(payload);
 
-        assertThat(logger.messages.debug, hasItem(`No command for: ${payload.event.text}`));
+        assertThat(logger.messages.debug, hasItem(`No command for: ${event.text}`));
       });
 
       it("doesn't send any reply message", async () => {
+        const spy = jest.spyOn(client.chat, 'postMessage')
+
         await subject.onAppMention(payload);
 
-        expect(say).not.toHaveBeenCalled();
+        expect(spy).not.toHaveBeenCalled();
       });
 
       describe('when `true` is provided in the `replyAll` param', () => {
         it("doesn't log a debug message", async () => {
           await subject.onAppMention(payload, true);
 
-          assertThat(logger.messages.debug, not(hasItem(`No command for: ${payload.event.text}`)));
+          assertThat(logger.messages.debug, not(hasItem(`No command for: ${event.text}`)));
         });
 
         it("replies informing that it doesn't know how to reply to the message", async () => {
+          const spy = jest.spyOn(client.chat, 'postMessage')
+
           await subject.onAppMention(payload, true);
 
-          expect(say).toHaveBeenCalledWith(`I don't know how to reply to: \`${payload.event.text}\``);
+          expect(spy).toHaveBeenCalledWith({
+            channel: event.channel,
+            text: `I don't know how to reply to: \`${event.text}\``
+          });
         });
       });
     });
   });
+
+  describe('onAppHomeOpened', () => {
+    beforeEach(async () => {
+      context = {userId: 'U123ABC456'};
+      event = {type: "app_home_opened", channel: 'C07QK0MHHKM', tab: "home", view: {}};
+      payload = {event, context};
+    });
+
+    it("uses a Slack client to publish a view", async () => {
+      const spy = jest.spyOn(client.views, 'publish')
+
+      await subject.onAppHomeOpened(payload);
+
+      expect(spy).toHaveBeenCalledWith({
+        user_id: context.userId,
+        view: expect.stringMatching('"type":"home"')
+      });
+    });
+  })
 });

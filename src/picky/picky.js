@@ -3,35 +3,35 @@ import Replies from '../replies/replies.js';
 import Commands from '../commands/commands.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 import DbMemory from '../brain/memory/db-memory.js';
+import SlackClients from "../slack/clients.js";
 
 export default class Picky {
-  constructor(brain, replies, commands, client, logger) {
+  constructor(brain, replies, commands, clients, logger) {
     this.brain = brain;
     this.replies = replies;
     this.commands = commands;
-    this.client = client;
+    this.clients = clients;
     this.logger = logger;
   }
 
   static async from(db, app) {
-    const teamInfo = await app.client.team.info();
-    await DbMemory.setUpTeam(db, teamInfo.team);
-    const memory = await DbMemory.from(db, teamInfo.team);
+    const memory = new DbMemory(db);
     const brain = new Brain(new RandomAcronyms(Math.random), memory, app.logger);
-    const replies = Replies.load(brain, app.logger);
-    const commands = Commands.load(brain, app.client, app.logger);
-    return new Picky(brain, replies, commands, app.client, app.logger);
+    const clients = new SlackClients(db, app.logger);
+    const replies = Replies.load(brain, clients, app.logger);
+    const commands = Commands.load(brain, clients, app.logger);
+    return new Picky(brain, replies, commands, clients, app.logger);
   }
 
-  async onMessage(payload, replyAll = false) {
-    const { event, context, say } = payload;
+  async onMessage({event, context}, replyAll = false) {
     const reply = this.replies.get(event);
 
-    if (reply === undefined && replyAll)
-      return say(`I don't know how to reply to: \`${event.text}\``).catch((error) => this.logger.error(error));
-
-    if (event.text.includes(context.botUserId)) {
-      this.logger.debug(`Ignoring message with mention: ${event.text}`);
+    if (reply === undefined && replyAll) {
+      const client = await this.clients.get(context);
+      await client.chat.postMessage({
+        channel: event.channel,
+        text: `I don't know how to reply to: \`${event.text}\``
+      });
       return;
     }
 
@@ -41,15 +41,20 @@ export default class Picky {
     }
 
     this.logger.info(`Replying to message: ${event.text}`);
-    await reply.accept(event, say);
+    await reply.accept(context, event);
   }
 
-  async onAppMention(payload, replyAll = false) {
-    const { event, say } = payload;
+  async onAppMention({context, event}, replyAll = false) {
     const command = this.commands.get(event);
 
-    if (command === undefined && replyAll)
-      return say(`I don't know how to reply to: \`${event.text}\``).catch((error) => this.logger.error(error));
+    if (command === undefined && replyAll) {
+      const client = await this.clients.get(context);
+      await client.chat.postMessage({
+        channel: event.channel,
+        text: `I don't know how to reply to: \`${event.text}\``
+      });
+      return;
+    }
 
     if (command === undefined) {
       this.logger.debug(`No command for: ${event.text}`);
@@ -57,11 +62,13 @@ export default class Picky {
     }
 
     this.logger.info(`Replying to mention: ${event.text}`);
-    await command.accept(event, say);
+    await command.accept(context, event);
   }
 
-  async onAppHomeOpened(payload) {
-    let view = {
+  async onAppHomeOpened({context}) {
+    const client = await this.clients.get(context);
+
+    const view = {
       type: 'home',
       title: {
         type: 'plain_text',
@@ -78,11 +85,6 @@ export default class Picky {
       ]
     };
 
-    await this.client.views.publish({
-      user_id: payload.context.userId,
-      view: JSON.stringify(view)
-    }).catch(error => {
-      this.logger.error(error);
-    });
+    await client.views.publish({user_id: context.userId, view: JSON.stringify(view)});
   }
 }
