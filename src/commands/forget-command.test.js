@@ -1,5 +1,5 @@
 import ForgetCommand from './forget-command.js';
-import { assertThat, is } from 'hamjest';
+import {assertThat, before, is} from 'hamjest';
 import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 import { TestLogger, testSlackClient } from '../../test/utils.js';
@@ -63,6 +63,24 @@ describe('ForgetCommand', () => {
         channel: event.channel,
         timestamp: event.ts,
         name: 'white_check_mark',
+      });
+    });
+
+    describe('when not providing a definition', () => {
+      beforeEach(() => {
+        event = {
+          channel: 'C07QK0MHHKM',
+          text: '@Picky forget API',
+          ts: 1728412412,
+        };
+      });
+
+      it('uses the brain to forget the acronym along with all existing definitions', async () => {
+        const spy = jest.spyOn(brain, 'forget');
+
+        await subject.accept(context, event);
+
+        expect(spy).toHaveBeenCalledWith(context, 'API');
       });
     });
   });
