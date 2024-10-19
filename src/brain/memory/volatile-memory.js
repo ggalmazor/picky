@@ -29,4 +29,8 @@ export default class VolatileMemory {
     if (this.data[acronym].length === 0) delete this.data[acronym];
     return Promise.resolve();
   }
+
+  async list(context) {
+    return this.data;
+  }
 }

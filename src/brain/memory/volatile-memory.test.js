@@ -30,9 +30,9 @@ describe('Volatile memory', () => {
 
   describe('learn', () => {
     it('learns new definitions for existing acronyms', async () => {
-      await subject.learn({}, 'ABC', 'Amazing Bright Castle');
+      await subject.learn({}, 'ABC', 'Another Banging Chaos');
 
-      assertThat(await subject.recall({}, 'ABC'), equalTo(['Agile Bouncy Coyote', 'Amazing Bright Castle']));
+      assertThat(await subject.recall({}, 'ABC'), equalTo(['Agile Bouncy Coyote', 'Another Banging Chaos']));
     });
 
     it('learns definitions for new acronyms', async () => {
@@ -50,19 +50,37 @@ describe('Volatile memory', () => {
 
   describe('forget', () => {
     beforeEach(() => {
-      subject = new VolatileMemory({ ABC: ['Agile Bouncy Coyote', 'Amazing Bright Castle'] });
+      subject = new VolatileMemory({ ABC: ['Agile Bouncy Coyote', 'Another Banging Chaos'] });
     });
 
     it('forgets existing definitions', async () => {
       await subject.forget({}, 'ABC', 'Agile Bouncy Coyote');
 
-      assertThat(await subject.recall({}, 'ABC'), equalTo(['Amazing Bright Castle']));
+      assertThat(await subject.recall({}, 'ABC'), equalTo(['Another Banging Chaos']));
     });
 
     it('forgets the acronym if no definition is provided', async () => {
       await subject.forget({}, 'ABC');
 
       assertThat(await subject.recall({}, 'ABC'), equalTo([]));
+    });
+  });
+
+  describe('list', () => {
+    beforeEach(() => {
+      subject = new VolatileMemory({
+        ABC: ['Agile Bouncy Coyote', "Another Banging Chaos"],
+        DEF: ["Definitely Expensive Flute"],
+      });
+    });
+
+    it('returns an object with all known acronyms and their definitions', async () => {
+      const list = await subject.list({});
+
+      assertThat(list, equalTo({
+        ABC: ['Agile Bouncy Coyote', "Another Banging Chaos"],
+        DEF: ["Definitely Expensive Flute"],
+      }));
     });
   });
 });
