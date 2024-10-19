@@ -1,8 +1,6 @@
-
 const forgetCommandMatcher = () => /forget ([A-Z]{2,5}) (.+?)$/;
 
 export default class ForgetCommand {
-
   constructor(brain, clients, logger) {
     this.brain = brain;
     this.clients = clients;

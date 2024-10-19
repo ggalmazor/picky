@@ -8,10 +8,9 @@ export default class SlackOAuth {
     const response = await this.client.oauth.v2.access({
       client_id: this.credentials.id,
       client_secret: this.credentials.secret,
-      code
+      code,
     });
-    const {access_token: accessToken, team, enterprise} = response;
-    return {accessToken, team, enterprise};
+    const { access_token: accessToken, team, enterprise } = response;
+    return { accessToken, team, enterprise };
   }
-
 }

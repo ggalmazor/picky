@@ -30,7 +30,15 @@ describe('DefineCommand', () => {
       );
       client = testSlackClient();
       logger = new TestLogger();
-      subject = new DefineCommand(brain, {async get() { return client; }}, logger);
+      subject = new DefineCommand(
+        brain,
+        {
+          async get() {
+            return client;
+          },
+        },
+        logger,
+      );
 
       context = {};
       event = { channel: 'C07QK0MHHKM', text: '@Picky define API' };
@@ -51,7 +59,7 @@ describe('DefineCommand', () => {
 
       expect(spy).toHaveBeenCalledWith({
         channel: event.channel,
-        text: 'API stands for: `Application Programming Interface`'
+        text: 'API stands for: `Application Programming Interface`',
       });
     });
 
@@ -67,7 +75,7 @@ describe('DefineCommand', () => {
 
         expect(spy).toHaveBeenCalledWith({
           channel: event.channel,
-          text: 'API stands for:\n```\nApplication Programming Interface\nApple Pie Inside\n```'
+          text: 'API stands for:\n```\nApplication Programming Interface\nApple Pie Inside\n```',
         });
       });
     });

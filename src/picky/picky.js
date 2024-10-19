@@ -3,7 +3,7 @@ import Replies from '../replies/replies.js';
 import Commands from '../commands/commands.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 import DbMemory from '../brain/memory/db-memory.js';
-import SlackClients from "../slack/clients.js";
+import SlackClients from '../slack/clients.js';
 
 export default class Picky {
   constructor(brain, replies, commands, clients, logger) {
@@ -23,14 +23,14 @@ export default class Picky {
     return new Picky(brain, replies, commands, clients, app.logger);
   }
 
-  async onMessage({event, context}, replyAll = false) {
+  async onMessage({ event, context }, replyAll = false) {
     const reply = this.replies.get(event);
 
     if (reply === undefined && replyAll) {
       const client = await this.clients.get(context);
       await client.chat.postMessage({
         channel: event.channel,
-        text: `I don't know how to reply to: \`${event.text}\``
+        text: `I don't know how to reply to: \`${event.text}\``,
       });
       return;
     }
@@ -44,14 +44,14 @@ export default class Picky {
     await reply.accept(context, event);
   }
 
-  async onAppMention({context, event}, replyAll = false) {
+  async onAppMention({ context, event }, replyAll = false) {
     const command = this.commands.get(event);
 
     if (command === undefined && replyAll) {
       const client = await this.clients.get(context);
       await client.chat.postMessage({
         channel: event.channel,
-        text: `I don't know how to reply to: \`${event.text}\``
+        text: `I don't know how to reply to: \`${event.text}\``,
       });
       return;
     }
@@ -65,26 +65,26 @@ export default class Picky {
     await command.accept(context, event);
   }
 
-  async onAppHomeOpened({context}) {
+  async onAppHomeOpened({ context }) {
     const client = await this.clients.get(context);
 
     const view = {
       type: 'home',
       title: {
         type: 'plain_text',
-        text: 'Picky explains acronyms'
+        text: 'Picky explains acronyms',
       },
       blocks: [
         {
-          type: "section",
+          type: 'section',
           text: {
-            type: "mrkdwn",
-            text: "*Welcome!* \n(nit)Picky explains acronyms used in your channels. Invite Picky; it will respond with an explanation every time someone uses an acronym. Picky will remember all the acronyms that it has listened to and explain. However, Picky will make up random acronym meanings unless someone explains them."
+            type: 'mrkdwn',
+            text: '*Welcome!* \n(nit)Picky explains acronyms used in your channels. Invite Picky; it will respond with an explanation every time someone uses an acronym. Picky will remember all the acronyms that it has listened to and explain. However, Picky will make up random acronym meanings unless someone explains them.',
           },
-        }
-      ]
+        },
+      ],
     };
 
-    await client.views.publish({user_id: context.userId, view: JSON.stringify(view)});
+    await client.views.publish({ user_id: context.userId, view: JSON.stringify(view) });
   }
 }

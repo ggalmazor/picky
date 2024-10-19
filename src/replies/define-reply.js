@@ -21,7 +21,7 @@ export default class DefineReply {
           definitions.length === 1
             ? `${acronym} stands for: \`${definitions[0]}\``
             : `${acronym} stands for:\n\`\`\`\n${definitions.join('\n')}\n\`\`\``;
-        return client.chat.postMessage({channel: event.channel, text});
+        return client.chat.postMessage({ channel: event.channel, text });
       }),
     );
   }

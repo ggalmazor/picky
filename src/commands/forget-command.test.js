@@ -28,13 +28,21 @@ describe('ForgetCommand', () => {
       );
       client = testSlackClient();
       logger = new TestLogger();
-      subject = new ForgetCommand(brain, {async get() { return client; }}, logger);
+      subject = new ForgetCommand(
+        brain,
+        {
+          async get() {
+            return client;
+          },
+        },
+        logger,
+      );
 
       context = {};
       event = {
         channel: 'C07QK0MHHKM',
         text: '@Picky forget API Application Programming Interface',
-        ts: 1728412412
+        ts: 1728412412,
       };
     });
 
@@ -54,7 +62,7 @@ describe('ForgetCommand', () => {
       expect(spy).toHaveBeenCalledWith({
         channel: event.channel,
         timestamp: event.ts,
-        name: 'white_check_mark'
+        name: 'white_check_mark',
       });
     });
   });

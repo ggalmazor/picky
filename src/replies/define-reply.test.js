@@ -1,19 +1,19 @@
 import DefineReply from './define-reply.js';
-import {assertThat, is} from 'hamjest';
+import { assertThat, is } from 'hamjest';
 import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
-import {TestLogger, testSlackClient} from '../../test/utils.js';
+import { TestLogger, testSlackClient } from '../../test/utils.js';
 import VolatileMemory from '../brain/memory/volatile-memory.js';
 
 describe('DefineReply', () => {
   describe('test', () => {
     it('returns true if the provided text matches the expected pattern for this Reply', () => {
-      assertThat(DefineReply.test({text: 'Has a single acronym: FOO'}), is(true));
-      assertThat(DefineReply.test({text: 'Has multiple acronyms: FOO BAR'}), is(true));
-      assertThat(DefineReply.test({text: 'FOO Acronyms can be BAR in any position BAZ'}), is(true));
-      assertThat(DefineReply.test({text: 'No acronyms'}), is(false));
-      assertThat(DefineReply.test({text: 'Acronyms have at least 2 letters: A'}), is(false));
-      assertThat(DefineReply.test({text: 'Acronyms have at most 5 letters: ABCDEF'}), is(false));
+      assertThat(DefineReply.test({ text: 'Has a single acronym: FOO' }), is(true));
+      assertThat(DefineReply.test({ text: 'Has multiple acronyms: FOO BAR' }), is(true));
+      assertThat(DefineReply.test({ text: 'FOO Acronyms can be BAR in any position BAZ' }), is(true));
+      assertThat(DefineReply.test({ text: 'No acronyms' }), is(false));
+      assertThat(DefineReply.test({ text: 'Acronyms have at least 2 letters: A' }), is(false));
+      assertThat(DefineReply.test({ text: 'Acronyms have at most 5 letters: ABCDEF' }), is(false));
     });
   });
 
@@ -31,14 +31,18 @@ describe('DefineReply', () => {
       );
       client = testSlackClient();
       logger = new TestLogger();
-      subject = new DefineReply(brain, {
-        async get() {
-          return client;
-        }
-      }, logger);
+      subject = new DefineReply(
+        brain,
+        {
+          async get() {
+            return client;
+          },
+        },
+        logger,
+      );
 
       context = {};
-      event = {channel: 'C07QK0MHHKM', text: 'HTML API'};
+      event = { channel: 'C07QK0MHHKM', text: 'HTML API' };
     });
 
     it('uses the brain to get acronym definitions', async () => {
@@ -57,11 +61,11 @@ describe('DefineReply', () => {
 
       expect(spy).toHaveBeenCalledWith({
         channel: event.channel,
-        text: 'HTML stands for: `Hyper Text Markup Language`'
+        text: 'HTML stands for: `Hyper Text Markup Language`',
       });
       expect(spy).toHaveBeenCalledWith({
         channel: event.channel,
-        text: 'API stands for: `Application Programming Interface`'
+        text: 'API stands for: `Application Programming Interface`',
       });
     });
 
@@ -78,11 +82,11 @@ describe('DefineReply', () => {
 
         expect(spy).toHaveBeenCalledWith({
           channel: event.channel,
-          text: 'API stands for:\n```\nApplication Programming Interface\nApple Pie Inside\n```'
+          text: 'API stands for:\n```\nApplication Programming Interface\nApple Pie Inside\n```',
         });
         expect(spy).toHaveBeenCalledWith({
           channel: event.channel,
-          text: 'HTML stands for:\n```\nHyper Text Markup Language\nHow To Make Lasagna\n```'
+          text: 'HTML stands for:\n```\nHyper Text Markup Language\nHow To Make Lasagna\n```',
         });
       });
     });

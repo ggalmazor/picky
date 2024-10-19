@@ -28,13 +28,21 @@ describe('LearnCommand', () => {
       );
       client = testSlackClient();
       logger = new TestLogger();
-      subject = new LearnCommand(brain, {async get() { return client; }}, logger);
+      subject = new LearnCommand(
+        brain,
+        {
+          async get() {
+            return client;
+          },
+        },
+        logger,
+      );
 
       context = {};
       event = {
         channel: 'C07QK0MHHKM',
         text: '@Picky learn API Application Programming Interface',
-        ts: 1728412412
+        ts: 1728412412,
       };
     });
 
@@ -51,11 +59,10 @@ describe('LearnCommand', () => {
 
       await subject.accept(context, event);
 
-
       expect(spy).toHaveBeenCalledWith({
         channel: event.channel,
         timestamp: event.ts,
-        name: 'white_check_mark'
+        name: 'white_check_mark',
       });
     });
   });

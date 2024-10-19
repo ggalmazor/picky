@@ -17,8 +17,7 @@ export default class VolatileMemory {
     if (await this.knows(acronym, definition)) return Promise.resolve();
 
     this.data[acronym] ||= [];
-    if (this.data[acronym].includes(definition))
-      return Promise.resolve();
+    if (this.data[acronym].includes(definition)) return Promise.resolve();
 
     this.data[acronym].push(definition);
     return Promise.resolve();

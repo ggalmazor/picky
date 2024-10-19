@@ -1,4 +1,4 @@
-import {buildSlackId} from "../brain/memory/db-memory.js";
+import { buildSlackId } from '../brain/memory/db-memory.js';
 
 export default class Installer {
   constructor(db, clients) {
@@ -16,39 +16,41 @@ export default class Installer {
   }
 
   async #getTeamUrl(enterprise, team) {
-    const client = await this.clients.get({enterpriseId: enterprise?.id, teamId: team.id});
+    const client = await this.clients.get({ enterpriseId: enterprise?.id, teamId: team.id });
     const teamInfo = await client.team.info();
     return teamInfo.team.url;
   }
 
-  async #setUpTeam({id: slackEnterpriseId, name: enterpriseName}, {id: slackTeamId, name: teamName}, accessToken) {
+  async #setUpTeam({ id: slackEnterpriseId, name: enterpriseName }, { id: slackTeamId, name: teamName }, accessToken) {
     const slackId = buildSlackId(slackEnterpriseId, slackTeamId);
 
-    const teamExists = (await this.db('teams').count('id', {as: 'count'}).where({slack_id: slackId}).first()).count == 1;
+    const teamExists =
+      (await this.db('teams').count('id', { as: 'count' }).where({ slack_id: slackId }).first()).count == 1;
     if (teamExists) {
       if (accessToken !== undefined)
-        await this.db('teams').update({access_token: accessToken}).where({slack_id: slackId});
+        await this.db('teams').update({ access_token: accessToken }).where({ slack_id: slackId });
       return;
     }
 
     if (slackEnterpriseId !== undefined) {
-      const enterpriseId = (await this.db('enterprises').returning("id").insert({
-        slack_id: slackEnterpriseId,
-        name: enterpriseName
-      }))[0].id;
+      const enterpriseId = (
+        await this.db('enterprises').returning('id').insert({
+          slack_id: slackEnterpriseId,
+          name: enterpriseName,
+        })
+      )[0].id;
       await this.db('teams').insert({
         enterprise_id: enterpriseId,
         slack_id: slackId,
         name: teamName,
-        access_token: accessToken
-      })
+        access_token: accessToken,
+      });
     } else {
       await this.db('teams').insert({
         slack_id: slackId,
         name: teamName,
-        access_token: accessToken
-      })
+        access_token: accessToken,
+      });
     }
   }
-
 }
