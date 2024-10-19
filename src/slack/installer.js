@@ -22,8 +22,8 @@ export default class Installer {
   }
 
   async #setUpTeam(enterprise, team, accessToken) {
-    const { id: slackEnterpriseId, name: enterpriseName } = (enterprise || {})
-    const { id: slackTeamId, name: teamName } = (team || {})
+    const { id: slackEnterpriseId, name: enterpriseName } = enterprise || {};
+    const { id: slackTeamId, name: teamName } = team || {};
     const slackId = buildSlackId(slackEnterpriseId, slackTeamId);
 
     const teamExists =
