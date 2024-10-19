@@ -57,7 +57,7 @@ describe('#completeInstallation()', () => {
             })
         )[0].id;
 
-        await subject.completeInstallation(slackEnterprise, slackTeam, 'new token');
+        await subject.completeInstallation(slackTeam, slackEnterprise, 'new token');
 
         const accessToken = (await db('teams').select('access_token').where('id', teamId).first()).access_token;
         assertThat(accessToken, equalTo('new token'));
@@ -66,7 +66,7 @@ describe('#completeInstallation()', () => {
 
     describe("when the team doesn't exist", () => {
       it('creates the enterprise', async () => {
-        await subject.completeInstallation(slackEnterprise, slackTeam, 'new token');
+        await subject.completeInstallation(slackTeam, slackEnterprise, 'new token');
 
         const result = await db('enterprises').select('id', 'name').where('slack_id', slackEnterprise.id).first();
         assertThat(
@@ -79,7 +79,7 @@ describe('#completeInstallation()', () => {
       });
 
       it('creates the team', async () => {
-        await subject.completeInstallation(slackEnterprise, slackTeam, 'new token');
+        await subject.completeInstallation(slackTeam, slackEnterprise, 'new token');
 
         const result = await db('teams')
           .select('id', 'name')
@@ -95,7 +95,7 @@ describe('#completeInstallation()', () => {
       });
 
       it('links the team with the enterprise', async () => {
-        await subject.completeInstallation(slackEnterprise, slackTeam, 'new token');
+        await subject.completeInstallation(slackTeam, slackEnterprise, 'new token');
 
         const enterpriseId = (await db('enterprises').select('id').where('slack_id', slackEnterprise.id).first()).id;
         const linkedEnterpriseId = (
@@ -109,7 +109,7 @@ describe('#completeInstallation()', () => {
 
       describe("when there's no enterprise", () => {
         it('leaves the enterprise_id column empty', async () => {
-          await subject.completeInstallation({}, slackTeam, 'new token');
+          await subject.completeInstallation(slackTeam, null, 'new token');
 
           const result = await db('teams')
             .select('id', 'name', 'enterprise_id')
@@ -128,7 +128,7 @@ describe('#completeInstallation()', () => {
     it("uses a Slack client to get the team's URL and returns it", async () => {
       client.team.info = jest.fn().mockReturnValue({ team: { url: 'https://foo.slack.com' } });
 
-      const teamUrl = await subject.completeInstallation({}, slackTeam, 'new token');
+      const teamUrl = await subject.completeInstallation(slackTeam, null, 'new token');
 
       expect(client.team.info).toHaveBeenCalled();
       assertThat(teamUrl, equalTo('https://foo.slack.com'));

@@ -10,18 +10,18 @@ export default class Installer {
     return new Installer(picky.db, picky.clients);
   }
 
-  async completeInstallation(enterprise, team, accessToken) {
-    await this.#setUpTeam(enterprise, team, accessToken);
-    return await this.#getTeamUrl(enterprise, team);
+  async completeInstallation(team, enterprise, accessToken) {
+    await this.#setUpTeam(team, enterprise, accessToken);
+    return await this.#getTeamUrl(team, enterprise);
   }
 
-  async #getTeamUrl(enterprise, team) {
+  async #getTeamUrl(team, enterprise) {
     const client = await this.clients.get({ enterpriseId: enterprise?.id, teamId: team.id });
     const teamInfo = await client.team.info();
     return teamInfo.team.url;
   }
 
-  async #setUpTeam(enterprise, team, accessToken) {
+  async #setUpTeam(team, enterprise, accessToken) {
     const { id: slackEnterpriseId, name: enterpriseName } = enterprise || {};
     const { id: slackTeamId, name: teamName } = team || {};
     const slackId = buildSlackId(slackEnterpriseId, slackTeamId);
