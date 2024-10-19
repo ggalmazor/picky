@@ -24,3 +24,12 @@ You can make Picky forget acronym definitions:
 ```
 
 Picky will add a ✅ reaction when it's done and it will stop using it along when explaining the acronym.
+
+## Commands: Define an acronym
+
+You can make Picky define an acronym:
+```
+@picky define <acronym>
+```
+
+Picky will reply in the same channel with definitions for the provided acronym
