@@ -3,7 +3,7 @@ import { mockBootUpContext } from '../test/utils.js';
 import { allOf, assertThat, containsString, hasItem, hasProperty, is, not, startsWith, undefined } from 'hamjest';
 import SlackClients from './slack/clients.js';
 import Picky from './picky/picky.js';
-import {LogLevel} from "@slack/web-api";
+import { LogLevel } from '@slack/web-api';
 
 async function withEnv(envEntries, block) {
   const originalEnv = process.env;
