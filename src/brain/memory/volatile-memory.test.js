@@ -1,5 +1,5 @@
 import VolatileMemory from './volatile-memory.js';
-import {assertThat, before, equalTo, is} from 'hamjest';
+import { assertThat, before, equalTo, is } from 'hamjest';
 
 describe('Volatile memory', () => {
   let subject;
@@ -69,18 +69,21 @@ describe('Volatile memory', () => {
   describe('list', () => {
     beforeEach(() => {
       subject = new VolatileMemory({
-        ABC: ['Agile Bouncy Coyote', "Another Banging Chaos"],
-        DEF: ["Definitely Expensive Flute"],
+        ABC: ['Agile Bouncy Coyote', 'Another Banging Chaos'],
+        DEF: ['Definitely Expensive Flute'],
       });
     });
 
     it('returns an object with all known acronyms and their definitions', async () => {
       const list = await subject.list({});
 
-      assertThat(list, equalTo({
-        ABC: ['Agile Bouncy Coyote', "Another Banging Chaos"],
-        DEF: ["Definitely Expensive Flute"],
-      }));
+      assertThat(
+        list,
+        equalTo({
+          ABC: ['Agile Bouncy Coyote', 'Another Banging Chaos'],
+          DEF: ['Definitely Expensive Flute'],
+        }),
+      );
     });
 
     it('returns only ignored acronyms if providing the `ignored = true` param', async () => {
@@ -88,9 +91,12 @@ describe('Volatile memory', () => {
 
       const list = await subject.list({}, true);
 
-      assertThat(list, equalTo({
-        DEF: ["Definitely Expensive Flute"],
-      }));
+      assertThat(
+        list,
+        equalTo({
+          DEF: ['Definitely Expensive Flute'],
+        }),
+      );
     });
 
     it('returns only non-ignored acronyms if providing the `ignored = false` param', async () => {
@@ -98,9 +104,12 @@ describe('Volatile memory', () => {
 
       const list = await subject.list({}, false);
 
-      assertThat(list, equalTo({
-        ABC: ['Agile Bouncy Coyote', "Another Banging Chaos"]
-      }));
+      assertThat(
+        list,
+        equalTo({
+          ABC: ['Agile Bouncy Coyote', 'Another Banging Chaos'],
+        }),
+      );
     });
   });
 

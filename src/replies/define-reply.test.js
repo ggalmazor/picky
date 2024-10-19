@@ -26,10 +26,7 @@ describe('DefineReply', () => {
         HTML: ['Hyper Text Markup Language'],
         API: ['Application Programming Interface'],
       });
-      brain = new Brain(
-        new RandomAcronyms(),
-        memory,
-      );
+      brain = new Brain(new RandomAcronyms(), memory);
       client = testSlackClient();
       logger = new TestLogger();
       subject = new DefineReply(
@@ -112,7 +109,7 @@ describe('DefineReply', () => {
 
         expect(spy).not.toHaveBeenCalledWith({
           channel: event.channel,
-          text: expect.stringContaining('API')
+          text: expect.stringContaining('API'),
         });
       });
     });

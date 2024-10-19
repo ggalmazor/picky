@@ -15,10 +15,8 @@ export default class ForgetCommand {
     const client = await this.clients.get(context);
     const [, acronym, definition] = event.text.match(forgetCommandMatcher());
 
-    if (definition === '')
-      this.brain.forget(context, acronym);
-    else
-      this.brain.forget(context, acronym, definition);
+    if (definition === '') this.brain.forget(context, acronym);
+    else this.brain.forget(context, acronym, definition);
     await client.reactions.add({ name: 'white_check_mark', channel: event.channel, timestamp: event.ts });
   }
 }

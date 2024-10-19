@@ -45,7 +45,7 @@ export default class VolatileMemory {
     return this.data;
   }
 
-  async ignore(context, acronym){
+  async ignore(context, acronym) {
     this.ignored.push(acronym);
   }
 
@@ -53,7 +53,7 @@ export default class VolatileMemory {
     return this.ignored.includes(acronym);
   }
 
-  async stopIgnoring(context, acronym){
+  async stopIgnoring(context, acronym) {
     this.ignored.splice(this.ignored.indexOf(acronym), 1);
   }
 }

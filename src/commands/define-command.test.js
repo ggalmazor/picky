@@ -25,10 +25,7 @@ describe('DefineCommand', () => {
       memory = new VolatileMemory({
         API: ['Application Programming Interface'],
       });
-      brain = new Brain(
-        new RandomAcronyms(),
-        memory,
-      );
+      brain = new Brain(new RandomAcronyms(), memory);
       client = testSlackClient();
       logger = new TestLogger();
       subject = new DefineCommand(
@@ -81,8 +78,8 @@ describe('DefineCommand', () => {
       });
     });
 
-    describe("when the acronym is ignored", () => {
-      it("adds a note in the reply message", async () => {
+    describe('when the acronym is ignored', () => {
+      it('adds a note in the reply message', async () => {
         await memory.ignore(context, 'API');
 
         const spy = jest.spyOn(client.chat, 'postMessage');

@@ -16,8 +16,7 @@ export default class DefineReply {
     const acronyms = [...event.text.matchAll(acronymMatcher())].map((a) => a[0]);
     await Promise.all(
       acronyms.map(async (acronym) => {
-        if (await this.brain.isIgnored(context, acronym))
-          return;
+        if (await this.brain.isIgnored(context, acronym)) return;
 
         const definitions = await this.brain.getDefinitions(context, acronym);
         const text =

@@ -1,5 +1,5 @@
 import StopIgnoringCommand from './stop-ignoring-command.js';
-import {assertThat, before, is} from 'hamjest';
+import { assertThat, before, is } from 'hamjest';
 import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 import { TestLogger, testSlackClient } from '../../test/utils.js';
@@ -19,10 +19,7 @@ describe('StopIgnoringCommand', () => {
     let context, event;
 
     beforeEach(() => {
-      brain = new Brain(
-        new RandomAcronyms(),
-        new VolatileMemory(),
-      );
+      brain = new Brain(new RandomAcronyms(), new VolatileMemory());
       client = testSlackClient();
       logger = new TestLogger();
       subject = new StopIgnoringCommand(

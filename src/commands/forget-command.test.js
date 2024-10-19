@@ -1,5 +1,5 @@
 import ForgetCommand from './forget-command.js';
-import {assertThat, before, is} from 'hamjest';
+import { assertThat, before, is } from 'hamjest';
 import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
 import { TestLogger, testSlackClient } from '../../test/utils.js';

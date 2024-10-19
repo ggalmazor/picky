@@ -17,13 +17,15 @@ export default class ListIgnoredCommand {
     const client = await this.clients.get(context);
 
     const acronyms = await this.brain.list(context, true);
-    const definedAcronyms = await Promise.all(Object.keys(acronyms).map(async acronym => {
-      const definitions = acronyms[acronym];
-      return definitions.length === 1
-        ? `${acronym} (ignored) stands for: \`${definitions[0]}\``
-        : `${acronym} (ignored) stands for:\n\`\`\`\n${definitions.join('\n')}\n\`\`\``;
-    }));
+    const definedAcronyms = await Promise.all(
+      Object.keys(acronyms).map(async (acronym) => {
+        const definitions = acronyms[acronym];
+        return definitions.length === 1
+          ? `${acronym} (ignored) stands for: \`${definitions[0]}\``
+          : `${acronym} (ignored) stands for:\n\`\`\`\n${definitions.join('\n')}\n\`\`\``;
+      }),
+    );
     const text = definedAcronyms.length === 0 ? 'No acronyms to list' : definedAcronyms.join('\n\n');
-    await client.chat.postMessage({channel: event.channel, text});
+    await client.chat.postMessage({ channel: event.channel, text });
   }
 }

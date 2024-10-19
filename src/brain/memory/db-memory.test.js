@@ -1,10 +1,10 @@
-import {v4 as uuid} from 'uuid';
-import DbMemory, {buildSlackId} from './db-memory.js';
-import {assertThat, equalTo, instanceOf, is, isRejectedWith, promiseThat} from 'hamjest';
+import { v4 as uuid } from 'uuid';
+import DbMemory, { buildSlackId } from './db-memory.js';
+import { assertThat, equalTo, instanceOf, is, isRejectedWith, promiseThat } from 'hamjest';
 import knex from 'knex';
 import profiles from '../../../knexfile.js';
-import {TeamNeedsSetUpError} from '../../errors/errors.js';
-import VolatileMemory from "./volatile-memory.js";
+import { TeamNeedsSetUpError } from '../../errors/errors.js';
+import VolatileMemory from './volatile-memory.js';
 
 describe('Database memory', () => {
   let db;
@@ -17,9 +17,9 @@ describe('Database memory', () => {
 
   beforeEach(async () => {
     await db.raw('START TRANSACTION');
-    slackTeam = {id: uuid(), name: 'Test team'};
-    slackEnterprise = {id: uuid(), name: 'Test enterprise'};
-    context = {teamId: slackTeam.id, enterpriseId: slackEnterprise.id};
+    slackTeam = { id: uuid(), name: 'Test team' };
+    slackEnterprise = { id: uuid(), name: 'Test enterprise' };
+    context = { teamId: slackTeam.id, enterpriseId: slackEnterprise.id };
 
     const enterpriseId = (
       await db('enterprises').returning('id').insert({
@@ -50,8 +50,8 @@ describe('Database memory', () => {
 
   describe('knows', () => {
     beforeEach(async () => {
-      const abc = (await db('acronyms').returning('id').insert({team_id: teamId, acronym: 'ABC'}))[0].id;
-      await db('definitions').insert({acronym_id: abc, definition: 'Agile Bouncy Coyote'});
+      const abc = (await db('acronyms').returning('id').insert({ team_id: teamId, acronym: 'ABC' }))[0].id;
+      await db('definitions').insert({ acronym_id: abc, definition: 'Agile Bouncy Coyote' });
     });
 
     it("returns true when there's a memorized definition for the provided acronym", async () => {
@@ -69,7 +69,7 @@ describe('Database memory', () => {
 
     it("throws an error when the team hasn't been set up yet", async () => {
       await promiseThat(
-        subject.knows({teamId: 'unknown'}, 'ABC', 'Another Banging Chaos'),
+        subject.knows({ teamId: 'unknown' }, 'ABC', 'Another Banging Chaos'),
         isRejectedWith(instanceOf(TeamNeedsSetUpError)),
       );
     });
@@ -77,8 +77,8 @@ describe('Database memory', () => {
 
   describe('recall', () => {
     beforeEach(async () => {
-      const abc = (await db('acronyms').returning('id').insert({team_id: teamId, acronym: 'ABC'}))[0].id;
-      await db('definitions').insert({acronym_id: abc, definition: 'Agile Bouncy Coyote'});
+      const abc = (await db('acronyms').returning('id').insert({ team_id: teamId, acronym: 'ABC' }))[0].id;
+      await db('definitions').insert({ acronym_id: abc, definition: 'Agile Bouncy Coyote' });
     });
 
     it('returns learned definitions for the provided acronym', async () => {
@@ -90,14 +90,14 @@ describe('Database memory', () => {
     });
 
     it("throws an error when the team hasn't been set up yet", async () => {
-      await promiseThat(subject.recall({teamId: 'unknown'}, 'ABC'), isRejectedWith(instanceOf(TeamNeedsSetUpError)));
+      await promiseThat(subject.recall({ teamId: 'unknown' }, 'ABC'), isRejectedWith(instanceOf(TeamNeedsSetUpError)));
     });
   });
 
   describe('learn', () => {
     beforeEach(async () => {
-      const abc = (await db('acronyms').returning('id').insert({team_id: teamId, acronym: 'ABC'}))[0].id;
-      await db('definitions').insert({acronym_id: abc, definition: 'Agile Bouncy Coyote'});
+      const abc = (await db('acronyms').returning('id').insert({ team_id: teamId, acronym: 'ABC' }))[0].id;
+      await db('definitions').insert({ acronym_id: abc, definition: 'Agile Bouncy Coyote' });
     });
 
     it('learns new definitions for existing acronyms', async () => {
@@ -120,7 +120,7 @@ describe('Database memory', () => {
 
     it("throws an error when the team hasn't been set up yet", async () => {
       await promiseThat(
-        subject.learn({teamId: 'unknown'}, 'ABC', 'Agile Bouncy Coyote'),
+        subject.learn({ teamId: 'unknown' }, 'ABC', 'Agile Bouncy Coyote'),
         isRejectedWith(instanceOf(TeamNeedsSetUpError)),
       );
     });
@@ -130,9 +130,9 @@ describe('Database memory', () => {
     let abc;
 
     beforeEach(async () => {
-      abc = (await db('acronyms').returning('id').insert({team_id: teamId, acronym: 'ABC'}))[0].id;
-      await db('definitions').insert({acronym_id: abc, definition: 'Agile Bouncy Coyote'});
-      await db('definitions').insert({acronym_id: abc, definition: 'Another Banging Chaos'});
+      abc = (await db('acronyms').returning('id').insert({ team_id: teamId, acronym: 'ABC' }))[0].id;
+      await db('definitions').insert({ acronym_id: abc, definition: 'Agile Bouncy Coyote' });
+      await db('definitions').insert({ acronym_id: abc, definition: 'Another Banging Chaos' });
     });
 
     it('deletes the row in `definitions` for the provided acronym and definition', async () => {
@@ -146,23 +146,23 @@ describe('Database memory', () => {
       await subject.forget(context, 'ABC', 'Agile Bouncy Coyote');
       await subject.forget(context, 'ABC', 'Another Banging Chaos');
 
-      const count = (await db('acronyms').count('id', {as: 'count'}).where({id: abc}))[0].count;
+      const count = (await db('acronyms').count('id', { as: 'count' }).where({ id: abc }))[0].count;
       assertThat(count, is('0'));
     });
 
     it('deletes the acronym with all definitions if no definition is provided', async () => {
       await subject.forget(context, 'ABC');
 
-      const definitionsCount = (await db('definitions').count('id', {as: 'count'}).where({id: abc}))[0].count;
+      const definitionsCount = (await db('definitions').count('id', { as: 'count' }).where({ id: abc }))[0].count;
       assertThat(definitionsCount, is('0'));
 
-      const count = (await db('acronyms').count('id', {as: 'count'}).where({id: abc}))[0].count;
+      const count = (await db('acronyms').count('id', { as: 'count' }).where({ id: abc }))[0].count;
       assertThat(count, is('0'));
     });
 
     it("throws an error when the team hasn't been set up yet", async () => {
       await promiseThat(
-        subject.forget({teamId: 'unknown'}, 'ABC', 'Agile Bouncy Coyote'),
+        subject.forget({ teamId: 'unknown' }, 'ABC', 'Agile Bouncy Coyote'),
         isRejectedWith(instanceOf(TeamNeedsSetUpError)),
       );
     });
@@ -170,18 +170,21 @@ describe('Database memory', () => {
 
   describe('list', () => {
     it('returns an object with of all known acronyms and their definitions', async () => {
-      const abc = (await db('acronyms').returning('id').insert({team_id: teamId, acronym: 'ABC'}))[0].id;
-      await db('definitions').insert({acronym_id: abc, definition: 'Agile Bouncy Coyote'});
-      await db('definitions').insert({acronym_id: abc, definition: 'Another Banging Chaos'});
-      const def = (await db('acronyms').returning('id').insert({team_id: teamId, acronym: 'DEF'}))[0].id;
-      await db('definitions').insert({acronym_id: def, definition: 'Definitely Expensive Flute'});
+      const abc = (await db('acronyms').returning('id').insert({ team_id: teamId, acronym: 'ABC' }))[0].id;
+      await db('definitions').insert({ acronym_id: abc, definition: 'Agile Bouncy Coyote' });
+      await db('definitions').insert({ acronym_id: abc, definition: 'Another Banging Chaos' });
+      const def = (await db('acronyms').returning('id').insert({ team_id: teamId, acronym: 'DEF' }))[0].id;
+      await db('definitions').insert({ acronym_id: def, definition: 'Definitely Expensive Flute' });
 
       const list = await subject.list(context);
 
-      assertThat(list, equalTo({
-        ABC: ['Agile Bouncy Coyote', "Another Banging Chaos"],
-        DEF: ["Definitely Expensive Flute"],
-      }));
+      assertThat(
+        list,
+        equalTo({
+          ABC: ['Agile Bouncy Coyote', 'Another Banging Chaos'],
+          DEF: ['Definitely Expensive Flute'],
+        }),
+      );
     });
 
     it('returns an empty object if there are no acronyms', async () => {
@@ -191,37 +194,47 @@ describe('Database memory', () => {
     });
 
     it('returns only ignored acronyms if providing the `ignored = true` param', async () => {
-      const abc = (await db('acronyms').returning('id').insert({team_id: teamId, acronym: 'ABC', ignored: false}))[0].id;
-      await db('definitions').insert({acronym_id: abc, definition: 'Agile Bouncy Coyote'});
-      await db('definitions').insert({acronym_id: abc, definition: 'Another Banging Chaos'});
-      const def = (await db('acronyms').returning('id').insert({team_id: teamId, acronym: 'DEF', ignored: true}))[0].id;
-      await db('definitions').insert({acronym_id: def, definition: 'Definitely Expensive Flute'});
+      const abc = (await db('acronyms').returning('id').insert({ team_id: teamId, acronym: 'ABC', ignored: false }))[0]
+        .id;
+      await db('definitions').insert({ acronym_id: abc, definition: 'Agile Bouncy Coyote' });
+      await db('definitions').insert({ acronym_id: abc, definition: 'Another Banging Chaos' });
+      const def = (await db('acronyms').returning('id').insert({ team_id: teamId, acronym: 'DEF', ignored: true }))[0]
+        .id;
+      await db('definitions').insert({ acronym_id: def, definition: 'Definitely Expensive Flute' });
 
       const list = await subject.list(context, true);
 
-      assertThat(list, equalTo({
-        DEF: ["Definitely Expensive Flute"],
-      }));
+      assertThat(
+        list,
+        equalTo({
+          DEF: ['Definitely Expensive Flute'],
+        }),
+      );
     });
 
     it('returns only non-ignored acronyms if providing the `ignored = false` param', async () => {
-      const abc = (await db('acronyms').returning('id').insert({team_id: teamId, acronym: 'ABC', ignored: false}))[0].id;
-      await db('definitions').insert({acronym_id: abc, definition: 'Agile Bouncy Coyote'});
-      await db('definitions').insert({acronym_id: abc, definition: 'Another Banging Chaos'});
-      const def = (await db('acronyms').returning('id').insert({team_id: teamId, acronym: 'DEF', ignored: true}))[0].id;
-      await db('definitions').insert({acronym_id: def, definition: 'Definitely Expensive Flute'});
+      const abc = (await db('acronyms').returning('id').insert({ team_id: teamId, acronym: 'ABC', ignored: false }))[0]
+        .id;
+      await db('definitions').insert({ acronym_id: abc, definition: 'Agile Bouncy Coyote' });
+      await db('definitions').insert({ acronym_id: abc, definition: 'Another Banging Chaos' });
+      const def = (await db('acronyms').returning('id').insert({ team_id: teamId, acronym: 'DEF', ignored: true }))[0]
+        .id;
+      await db('definitions').insert({ acronym_id: def, definition: 'Definitely Expensive Flute' });
 
       const list = await subject.list(context, false);
 
-      assertThat(list, equalTo({
-        ABC: ['Agile Bouncy Coyote', "Another Banging Chaos"]
-      }));
+      assertThat(
+        list,
+        equalTo({
+          ABC: ['Agile Bouncy Coyote', 'Another Banging Chaos'],
+        }),
+      );
     });
   });
 
   describe('ignore', () => {
     it('sets the ignored flag to true on the provided acronym', async () => {
-      await db('acronyms').insert({team_id: teamId, acronym: 'ABC', ignored: false});
+      await db('acronyms').insert({ team_id: teamId, acronym: 'ABC', ignored: false });
 
       await subject.ignore(context, 'ABC');
 
@@ -239,8 +252,8 @@ describe('Database memory', () => {
 
   describe('isIgnored', () => {
     it('returns the value of the `ignored` column in the acronym row', async () => {
-      await db('acronyms').insert({team_id: teamId, acronym: 'ABC', ignored: false});
-      await db('acronyms').insert({team_id: teamId, acronym: 'DEF', ignored: true});
+      await db('acronyms').insert({ team_id: teamId, acronym: 'ABC', ignored: false });
+      await db('acronyms').insert({ team_id: teamId, acronym: 'DEF', ignored: true });
 
       assertThat(await subject.isIgnored(context, 'ABC'), is(false));
       assertThat(await subject.isIgnored(context, 'DEF'), is(true));
@@ -253,7 +266,7 @@ describe('Database memory', () => {
 
   describe('stopIgnoring', () => {
     it('sets the ignored flag to false on the provided acronym', async () => {
-      await db('acronyms').insert({team_id: teamId, acronym: 'ABC', ignored: true});
+      await db('acronyms').insert({ team_id: teamId, acronym: 'ABC', ignored: true });
 
       await subject.stopIgnoring(context, 'ABC');
 

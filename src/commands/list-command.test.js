@@ -24,13 +24,10 @@ describe('ListCommand', () => {
 
     beforeEach(() => {
       memory = new VolatileMemory({
-        ABC: ['Agile Bouncy Coyote', "Another Banging Chaos"],
-        DEF: ["Definitely Expensive Flute"],
+        ABC: ['Agile Bouncy Coyote', 'Another Banging Chaos'],
+        DEF: ['Definitely Expensive Flute'],
       });
-      brain = new Brain(
-        new RandomAcronyms(),
-        memory,
-      );
+      brain = new Brain(new RandomAcronyms(), memory);
       client = testSlackClient();
       logger = new TestLogger();
       subject = new ListCommand(
@@ -62,12 +59,12 @@ describe('ListCommand', () => {
 
       expect(spy).toHaveBeenCalledWith({
         channel: event.channel,
-        text: `ABC stands for:\n\`\`\`\nAgile Bouncy Coyote\nAnother Banging Chaos\n\`\`\`\n\nDEF stands for: \`Definitely Expensive Flute\``
+        text: `ABC stands for:\n\`\`\`\nAgile Bouncy Coyote\nAnother Banging Chaos\n\`\`\`\n\nDEF stands for: \`Definitely Expensive Flute\``,
       });
     });
 
-    describe("when an acronym is ignored", () => {
-      it("adds a note in the reply message", async () => {
+    describe('when an acronym is ignored', () => {
+      it('adds a note in the reply message', async () => {
         await memory.ignore(context, 'ABC');
 
         const spy = jest.spyOn(client.chat, 'postMessage');
@@ -76,7 +73,7 @@ describe('ListCommand', () => {
 
         expect(spy).toHaveBeenCalledWith({
           channel: event.channel,
-          text: `ABC (ignored) stands for:\n\`\`\`\nAgile Bouncy Coyote\nAnother Banging Chaos\n\`\`\`\n\nDEF stands for: \`Definitely Expensive Flute\``
+          text: `ABC (ignored) stands for:\n\`\`\`\nAgile Bouncy Coyote\nAnother Banging Chaos\n\`\`\`\n\nDEF stands for: \`Definitely Expensive Flute\``,
         });
       });
     });
@@ -90,8 +87,8 @@ describe('ListCommand', () => {
 
       expect(spy).toHaveBeenCalledWith({
         channel: event.channel,
-        text: `No acronyms to list`
+        text: `No acronyms to list`,
       });
-    })
+    });
   });
 });
