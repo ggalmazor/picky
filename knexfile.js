@@ -25,7 +25,7 @@ export default {
 
   production: {
     client: 'postgresql',
-    connection: {
+    connection: process.env.DATABASE_URL || {
       host: process.env.DATABASE_HOST,
       port: process.env.DATABASE_PORT,
       user: process.env.DATABASE_USER,
