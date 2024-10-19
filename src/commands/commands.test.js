@@ -1,8 +1,8 @@
-import {assertThat, hasProperties, instanceOf, is} from 'hamjest';
+import { assertThat, hasProperties, instanceOf, is } from 'hamjest';
 import Commands from './commands.js';
 import Brain from '../brain/brain.js';
 import RandomAcronyms from '../brain/acronyms/random-acronyms.js';
-import {TestLogger} from '../../test/utils.js';
+import { TestLogger } from '../../test/utils.js';
 
 class TestCommand {
   constructor(brain, clients, logger) {
@@ -17,7 +17,7 @@ class TestCommand {
 }
 
 function buildEvent() {
-  return {text: 'foo bar baz'};
+  return { text: 'foo bar baz' };
 }
 
 describe('Commands', () => {
@@ -44,7 +44,7 @@ describe('Commands', () => {
       });
 
       it('passes through the brain, client, and logger instances', () => {
-        assertThat(subject.get(buildEvent()), hasProperties({brain, clients, logger}));
+        assertThat(subject.get(buildEvent()), hasProperties({ brain, clients, logger }));
       });
     });
 

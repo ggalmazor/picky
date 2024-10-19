@@ -1,11 +1,11 @@
 import knex from 'knex';
 import profiles from '../../knexfile.js';
-import {buildSlackId} from '../brain/memory/db-memory.js';
+import { buildSlackId } from '../brain/memory/db-memory.js';
 import SlackClients from './clients.js';
-import {TestLogger} from '../../test/utils.js';
-import {assertThat, equalTo, instanceOf, is, isRejectedWith, promiseThat} from 'hamjest';
-import {WebClient} from '@slack/web-api';
-import {TeamNeedsSetUpError} from '../errors/errors.js';
+import { TestLogger } from '../../test/utils.js';
+import { assertThat, equalTo, instanceOf, is, isRejectedWith, promiseThat } from 'hamjest';
+import { WebClient } from '@slack/web-api';
+import { TeamNeedsSetUpError } from '../errors/errors.js';
 
 class TestCache {
   async fetch(key, factory) {
@@ -45,7 +45,7 @@ describe('Clients', () => {
         teamId: 'team',
       };
       const slackId = buildSlackId(context.enterpriseId, context.teamId);
-      await db('teams').insert({name: 'Test team', slack_id: slackId, access_token: 'access token'});
+      await db('teams').insert({ name: 'Test team', slack_id: slackId, access_token: 'access token' });
 
       const client = await subject.get(context);
 
@@ -55,7 +55,7 @@ describe('Clients', () => {
 
     it("throws an error when the team hasn't been set up yet", async () => {
       await promiseThat(
-        subject.get({enterpriseId: 'unknown', teamId: 'unknown'}),
+        subject.get({ enterpriseId: 'unknown', teamId: 'unknown' }),
         isRejectedWith(instanceOf(TeamNeedsSetUpError)),
       );
     });
