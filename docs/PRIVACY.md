@@ -26,9 +26,19 @@ We use the information collected in the following ways:
 - To improve the app's functionality and user experience.
 - For troubleshooting and maintenance (logging only when necessary for resolving bugs).
 
-## Data Retention
+## Data Retention and Archival Policy
 
-(nit)Picky stores acronyms and definitions until you instruct the app to forget them. Debugging logs are only kept temporarily and are deleted once the issue has been resolved.
+- **Acronyms and Definitions**
+
+  Acronyms and their definitions are stored until you explicitly instruct the app to forget them using the `@picky forget` command.
+
+- **Log Data for Debugging**
+
+  Log data collected during the debugging process is kept only temporarily. Once the issue is resolved, all logged data is deleted to ensure no sensitive information is retained.
+
+- **Archival of Data**
+
+(nit)Picky does not archive any acronyms, definitions, or log data after they are removed from the system. Once data is deleted based on user commands or after debugging, it is permanently erased from our systems.
 
 ## Data Sharing
 
