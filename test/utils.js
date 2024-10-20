@@ -93,6 +93,18 @@ export const testSlackClient = () => new Proxy(
   }
 );
 
+export async function withEnv(envEntries, block) {
+  const originalEnv = process.env;
+  process.env = {
+    ...originalEnv,
+    ...envEntries,
+  };
+
+  await block();
+
+  process.env = originalEnv;
+}
+
 export function mockBootUpContext() {
   const logger = new TestLogger();
   const app = {

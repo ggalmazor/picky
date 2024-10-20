@@ -1,20 +1,8 @@
 import { v4 as uuid } from 'uuid';
-import { mockBootUpContext } from '../test/utils.js';
+import { mockBootUpContext, withEnv } from '../test/utils.js';
 import { allOf, assertThat, containsString, hasItem, hasProperty, is, not, startsWith, undefined } from 'hamjest';
 import SlackClients from './slack/clients.js';
 import Picky from './picky/picky.js';
-
-async function withEnv(envEntries, block) {
-  const originalEnv = process.env;
-  process.env = {
-    ...originalEnv,
-    ...envEntries,
-  };
-
-  await block();
-
-  process.env = originalEnv;
-}
 
 describe('Boot up script (index)', () => {
   const { app, BoltApp, db, knex, logger, clients, picky, slackOAuth, installer } = mockBootUpContext();
