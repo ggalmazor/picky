@@ -7,6 +7,8 @@
 - Picky will define an acronym when someone uses it.
 - Picky remembers all the acronyms that have been explained. However, Picky makes up random definitions, so you better teach it the good ones!
 
+<a href="https://slack.com/oauth/v2/authorize?client_id=7828417850918.7820563959399&scope=app_mentions:read,channels:history,chat:write,im:history,im:write,reactions:write,team:read&user_scope="><img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcSet="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a>
+
 ## Commands: Learn new acronym definition
 
 You can teach Picky new acronym definitions:
