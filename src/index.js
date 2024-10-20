@@ -85,6 +85,7 @@ async function init() {
         const { team, enterprise, accessToken } = await slackOAuth.access(code);
 
         const redirectUrl = await installer.completeInstallation(team, enterprise, accessToken);
+        app.logger.info(`🎉 Team ${team.id} installed`);
 
         res.writeHead(302, { Location: redirectUrl });
         res.end(`Success! You will now be redirected to ${redirectUrl}`);

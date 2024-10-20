@@ -280,7 +280,7 @@ describe('Boot up script (index)', () => {
 
     it('completes the installation of the app for the received team', async () => {
       const accessToken = 'some token';
-      const team = { id: 'team ID', name: 'team name' };
+      const team = { id: 'TEAMID', name: 'team name' };
       const enterprise = { id: 'enterprise ID', name: 'enterprise name' };
       slackOAuth.access.mockResolvedValue({ accessToken, team, enterprise });
 
@@ -289,6 +289,19 @@ describe('Boot up script (index)', () => {
       await app.receiver.routes['/oauth']['GET'](req, res);
 
       expect(installer.completeInstallation).toHaveBeenCalledWith(team, enterprise, accessToken);
+    });
+
+    it('adds a log message', async () => {
+      const accessToken = 'some token';
+      const team = { id: 'TEAMID', name: 'team name' };
+      const enterprise = { id: 'enterprise ID', name: 'enterprise name' };
+      slackOAuth.access.mockResolvedValue({ accessToken, team, enterprise });
+
+      await import(`./../src/index.js?randomizer=${uuid()}`);
+
+      await app.receiver.routes['/oauth']['GET'](req, res);
+
+      assertThat(logger.messages.info, hasItem('🎉 Team TEAMID installed'));
     });
 
     it("responds with an HTTP 302 targeting the team's Slack URL", async () => {

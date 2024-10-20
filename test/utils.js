@@ -137,11 +137,11 @@ export function mockBootUpContext() {
     access: jest.fn().mockResolvedValue({
       access_token: 'some token',
       team: {
-        id: "team ID",
+        id: "TEAMID",
         name: 'team name'
       },
       enterprise: {
-        id: 'enterprise ID',
+        id: 'ENTERPRISEID',
         name: 'enterprise name'
       }
     })
