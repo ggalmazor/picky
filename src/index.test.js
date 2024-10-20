@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { mockBootUpContext, withEnv } from '../test/utils.js';
-import { allOf, assertThat, containsString, hasItem, hasProperty, is, not, startsWith, undefined } from 'hamjest';
+import { allOf, assertThat, containsString, hasItem, hasProperty, startsWith } from 'hamjest';
 import SlackClients from './slack/clients.js';
 import Picky from './picky/picky.js';
 
@@ -210,7 +210,7 @@ describe('Boot up script (index)', () => {
     it('triggers the uninstall operation with the team_id and enterprise_id in the payload', async () => {
       await import(`./../src/index.js?randomizer=${uuid()}`);
 
-      const payload = { team_id: 'TEAMID', enterprise_id: 'ENTERPRISEID' };
+      const payload = { context: { teamId: 'TEAMID', enterpriseId: 'ENTERPRISEID' } };
       await app.sendEvent('app_uninstalled', payload);
 
       expect(installer.uninstall).toHaveBeenCalledWith('TEAMID', 'ENTERPRISEID');
@@ -220,7 +220,7 @@ describe('Boot up script (index)', () => {
       it('triggers the uninstall operation with the team_id only', async () => {
         await import(`./../src/index.js?randomizer=${uuid()}`);
 
-        const payload = { team_id: 'TEAMID', enterprise_id: undefined };
+        const payload = { context: { teamId: 'TEAMID', isEnterpriseInstall: false } };
         await app.sendEvent('app_uninstalled', payload);
 
         expect(installer.uninstall).toHaveBeenCalledWith('TEAMID', undefined);
@@ -230,7 +230,7 @@ describe('Boot up script (index)', () => {
     it('adds a log message', async () => {
       await import(`./../src/index.js?randomizer=${uuid()}`);
 
-      const payload = { event: { team_id: 'TEAMID' } };
+      const payload = { context: { teamId: 'TEAMID', enterpriseId: 'ENTERPRISEID' } };
       await app.sendEvent('app_uninstalled', payload);
 
       assertThat(logger.messages.info, hasItem('⚠️ Team TEAMID uninstalled'));
@@ -241,7 +241,7 @@ describe('Boot up script (index)', () => {
 
       await import(`./../src/index.js?randomizer=${uuid()}`);
 
-      const payload = { event: {} };
+      const payload = { context: { teamId: 'TEAMID', enterpriseId: 'ENTERPRISEID' } };
       await app.sendEvent('app_uninstalled', payload);
 
       assertThat(
@@ -266,7 +266,7 @@ describe('Boot up script (index)', () => {
     it('sets up a custom route to deal with OAuth installations', async () => {
       await import(`./../src/index.js?randomizer=${uuid()}`);
 
-      assertThat(app.receiver.routes, hasProperty('/oauth', hasProperty('GET', is(not(undefined())))));
+      assertThat(app.receiver.routes, hasProperty('/oauth', hasProperty('GET')));
     });
 
     it('exchanges the received code for an access token', async () => {
