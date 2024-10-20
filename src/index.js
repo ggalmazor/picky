@@ -71,6 +71,7 @@ async function init() {
   console.log('👂app home opened listener registered');
 
   app.event('app_uninstalled', async (payload) => {
+    app.logger.debug(payload.event);
     await installer.uninstall(payload.event.team_id).catch((error) => app.logger.error(error.stack));
 
     app.logger.info(`⚠️ Team ${payload.event.team_id} uninstalled`);
