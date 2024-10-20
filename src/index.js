@@ -19,7 +19,7 @@ async function init() {
     pool: { min: 0, max: 4 },
   });
 
-  console.log("✅ Connected to the database");
+  console.log('✅ Connected to the database');
 
   const app = new bolt.App({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -27,10 +27,10 @@ async function init() {
     socketMode: process.env.SLACK_APP_MODE === 'socket',
     appToken: process.env.SLACK_APP_TOKEN,
   });
-  console.log("✅ Slack App created");
+  console.log('✅ Slack App created');
 
   const clients = SlackClients.build(db, app.logger);
-  console.log("✅ Slack Clients created");
+  console.log('✅ Slack Clients created');
 
   const slackOAuth = new SlackOAuth(
     app.client,
@@ -40,13 +40,13 @@ async function init() {
     },
     app.logger,
   );
-  console.log("✅ Slack OAuth created");
+  console.log('✅ Slack OAuth created');
 
   const installer = new Installer(db, clients);
-  console.log("✅ Slack App Installer created");
+  console.log('✅ Slack App Installer created');
 
   const picky = await Picky.from(db, app, clients);
-  console.log("🤖 Picky created");
+  console.log('🤖 Picky created');
 
   app.event('message', async (payload) => {
     if (payload.event.bot_profile !== undefined) return;
@@ -55,19 +55,19 @@ async function init() {
 
     return picky.onMessage(payload).catch((error) => app.logger.error(error.stack));
   });
-  console.log("👂message listener registered");
+  console.log('👂message listener registered');
 
   app.event('app_mention', async (payload) => {
     if (payload.event.bot_profile !== undefined) return;
 
     return picky.onAppMention(payload).catch((error) => app.logger.error(error.stack));
   });
-  console.log("👂mentions listener registered");
+  console.log('👂mentions listener registered');
 
   app.event('app_home_opened', async (payload) => {
     return picky.onAppHomeOpened(payload).catch((error) => app.logger.error(error.stack));
   });
-  console.log("👂app home listener registered");
+  console.log('👂app home listener registered');
 
   app.receiver.routes = {
     '/oauth': {
@@ -93,7 +93,7 @@ async function init() {
       },
     },
   };
-  console.log("✅ custom web routes added");
+  console.log('✅ custom web routes added');
 
   return app;
 }
