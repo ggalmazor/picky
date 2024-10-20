@@ -26,6 +26,7 @@ async function init() {
     token: process.env.SLACK_BOT_TOKEN,
     socketMode: process.env.SLACK_APP_MODE === 'socket',
     appToken: process.env.SLACK_APP_TOKEN,
+    logLevel: process.env.LOG_LEVEL,
   });
   console.log('✅ Slack App created');
 

@@ -58,6 +58,7 @@ describe('Boot up script (index)', () => {
           SLACK_BOT_TOKEN: 'SLACK_BOT_TOKEN',
           SLACK_APP_TOKEN: 'SLACK_APP_TOKEN',
           SLACK_APP_MODE: 'https',
+          LOG_LEVEL: 'info',
         },
         async () => {
           await import(`./../src/index.js?randomizer=${uuid()}`);
@@ -67,6 +68,7 @@ describe('Boot up script (index)', () => {
             token: 'SLACK_BOT_TOKEN',
             socketMode: false,
             appToken: 'SLACK_APP_TOKEN',
+            logLevel: 'info',
           });
         },
       );
@@ -80,6 +82,7 @@ describe('Boot up script (index)', () => {
             SLACK_BOT_TOKEN: 'SLACK_BOT_TOKEN',
             SLACK_APP_TOKEN: 'SLACK_APP_TOKEN',
             SLACK_APP_MODE: 'socket',
+            LOG_LEVEL: 'info',
           },
           async () => {
             await import(`./../src/index.js?randomizer=${uuid()}`);
@@ -89,6 +92,7 @@ describe('Boot up script (index)', () => {
               token: 'SLACK_BOT_TOKEN',
               socketMode: true,
               appToken: 'SLACK_APP_TOKEN',
+              logLevel: 'info',
             });
           },
         );
