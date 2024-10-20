@@ -224,6 +224,15 @@ describe('Boot up script (index)', () => {
       expect(installer.uninstall).toHaveBeenCalledWith('TEAMID');
     });
 
+    it('adds a log message', async () => {
+      await import(`./../src/index.js?randomizer=${uuid()}`);
+
+      const payload = { event: { team_id: 'TEAMID' } };
+      await app.sendEvent('app_uninstalled', payload);
+
+      assertThat(logger.messages.info, hasItem('⚠️ Team TEAMID uninstalled'));
+    });
+
     it('logs the error stacktrace', async () => {
       installer.uninstall.mockRejectedValue(new Error('Boom!'));
 
