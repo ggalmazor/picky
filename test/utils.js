@@ -152,7 +152,8 @@ export function mockBootUpContext() {
   }));
 
   const installer = {
-    completeInstallation: jest.fn().mockResolvedValue("https://foo.slack.com")
+    completeInstallation: jest.fn().mockResolvedValue("https://foo.slack.com"),
+    uninstall: jest.fn().mockResolvedValue()
   };
 
   jest.unstable_mockModule('../src/slack/installer', () => ({

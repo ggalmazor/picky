@@ -62,12 +62,17 @@ async function init() {
 
     return picky.onAppMention(payload).catch((error) => app.logger.error(error.stack));
   });
-  console.log('👂mentions listener registered');
+  console.log('👂app mention listener registered');
 
   app.event('app_home_opened', async (payload) => {
     return picky.onAppHomeOpened(payload).catch((error) => app.logger.error(error.stack));
   });
-  console.log('👂app home listener registered');
+  console.log('👂app home opened listener registered');
+
+  app.event('app_uninstalled', async (payload) => {
+    return installer.uninstall(payload.event.team_id).catch((error) => app.logger.error(error.stack));
+  });
+  console.log('👂app uninstalled listener registered');
 
   app.receiver.routes = {
     '/oauth': {

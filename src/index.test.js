@@ -214,6 +214,31 @@ describe('Boot up script (index)', () => {
     });
   });
 
+  describe('listens to app_uninstalled events', () => {
+    it('triggers the uninstall operation with the team_id in the event', async () => {
+      await import(`./../src/index.js?randomizer=${uuid()}`);
+
+      const payload = { event: { team_id: 'TEAMID' } };
+      await app.sendEvent('app_uninstalled', payload);
+
+      expect(installer.uninstall).toHaveBeenCalledWith('TEAMID');
+    });
+
+    it('logs the error stacktrace', async () => {
+      installer.uninstall.mockRejectedValue(new Error('Boom!'));
+
+      await import(`./../src/index.js?randomizer=${uuid()}`);
+
+      const payload = { event: {} };
+      await app.sendEvent('app_uninstalled', payload);
+
+      assertThat(
+        logger.messages.error,
+        hasItem(allOf(startsWith('Error: Boom!\n'), containsString('at Object.<anonymous>'))),
+      );
+    });
+  });
+
   describe('sets up OAuth installations', () => {
     let req, res;
 
