@@ -155,7 +155,7 @@ describe('Installer', () => {
     });
 
     it('deletes the team and all associated acronyms and definitions', async () => {
-      await subject.uninstall('TEAMID');
+      await subject.uninstall('TEAMID', undefined);
 
       const definitionExists = (await db('definitions').count('id').where({ id: definitionId }).first()).id == 1;
       assertThat(definitionExists, is(false));
@@ -178,7 +178,7 @@ describe('Installer', () => {
       });
 
       it('deletes the enterprise too', async () => {
-        await subject.uninstall('TEAMID');
+        await subject.uninstall('TEAMID', 'ENTERPRISEID');
 
         const definitionExists = (await db('definitions').count('id').where({ id: definitionId }).first()).id == 1;
         assertThat(definitionExists, is(false));
@@ -194,6 +194,7 @@ describe('Installer', () => {
     describe("When the team doesn't exist", () => {
       it('silently completes the operation', async () => {
         await promiseThat(subject.uninstall('NONEXISTINGTEAM'), is(fulfilled()));
+        await promiseThat(subject.uninstall('NONEXISTINGTEAM', 'NONEXISTINGENTERPRISE'), is(fulfilled()));
       });
     });
   });
