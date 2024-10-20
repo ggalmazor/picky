@@ -43,7 +43,7 @@ Example: `@picky forget HTML`
 
 Picky can replace all existing definitions of an acronym with a new one.
 
-Usage: `@picky replace <acronym> [definition]`
+Usage: `@picky replace <acronym> <definition>`
 
 Example: `@picky replace HTML How To Make Lasagna`
 
