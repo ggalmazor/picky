@@ -15,6 +15,12 @@ export default class Installer {
     return await this.#getTeamUrl(team, enterprise);
   }
 
+  async uninstall(teamId) {
+    const result = await this.db('teams').returning('enterprise_id').delete().whereILike('slack_id', `%.${teamId}`);
+
+    if (result !== undefined) await this.db('enterprises').delete().where({ id: result[0].enterprise_id });
+  }
+
   async #getTeamUrl(team, enterprise) {
     const client = await this.clients.get({ enterpriseId: enterprise?.id, teamId: team.id });
     const teamInfo = await client.team.info();
