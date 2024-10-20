@@ -1,7 +1,7 @@
 // noinspection EqualityComparisonWithCoercionJS
 
 import { v4 as uuid } from 'uuid';
-import { assertThat, equalTo, hasProperties, is, not } from 'hamjest';
+import { assertThat, equalTo, fulfilled, hasProperties, is, not, promiseThat } from 'hamjest';
 import knex from 'knex';
 import profiles from '../../knexfile.js';
 import Installer from './installer.js';
@@ -188,6 +188,12 @@ describe('Installer', () => {
         assertThat(teamExists, is(false));
         const enterpriseExists = (await db('enterprises').count('id').where({ id: enterpriseId }).first()).id == 1;
         assertThat(enterpriseExists, is(false));
+      });
+    });
+
+    describe("When the team doesn't exist", () => {
+      it('silently completes the operation', async () => {
+        await promiseThat(subject.uninstall('NONEXISTINGTEAM'), is(fulfilled()));
       });
     });
   });
