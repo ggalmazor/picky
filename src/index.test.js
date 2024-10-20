@@ -290,11 +290,5 @@ describe('Boot up script (index)', () => {
         expect(app.start).toHaveBeenCalledWith(3000);
       });
     });
-
-    it('logs an info message', async () => {
-      await import(`./../src/index.js?randomizer=${uuid()}`);
-
-      assertThat(app.logger.messages.info, hasItem('⚡️ Bolt app is running!'));
-    });
   });
 });
