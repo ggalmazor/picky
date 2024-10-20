@@ -5,7 +5,6 @@ import Picky from './picky/picky.js';
 import SlackOAuth from './slack/oauth.js';
 import Installer from './slack/installer.js';
 import SlackClients from './slack/clients.js';
-import { LogLevel } from '@slack/web-api';
 
 const db = knex({
   client: 'postgresql',
@@ -16,7 +15,7 @@ const db = knex({
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
   },
-  pool: { min: 0, max: 4 },
+  pool: {min: 0, max: 4},
 });
 
 const app = new bolt.App({
@@ -62,11 +61,11 @@ app.receiver.routes = {
       const url = new URL(`https://example.com${req.url}`);
       const code = url.searchParams.get('code');
 
-      const { team, enterprise, accessToken } = await slackOAuth.access(code);
+      const {team, enterprise, accessToken} = await slackOAuth.access(code);
 
       const redirectUrl = await installer.completeInstallation(team, enterprise, accessToken);
 
-      res.writeHead(302, { Location: redirectUrl });
+      res.writeHead(302, {Location: redirectUrl});
       res.end(`Success! You will now be redirected to ${redirectUrl}`);
     },
   },

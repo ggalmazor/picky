@@ -1,9 +1,8 @@
-import { v4 as uuid } from 'uuid';
-import { mockBootUpContext } from '../test/utils.js';
-import { allOf, assertThat, containsString, hasItem, hasProperty, is, not, startsWith, undefined } from 'hamjest';
+import {v4 as uuid} from 'uuid';
+import {mockBootUpContext} from '../test/utils.js';
+import {allOf, assertThat, containsString, hasItem, hasProperty, is, not, startsWith, undefined} from 'hamjest';
 import SlackClients from './slack/clients.js';
 import Picky from './picky/picky.js';
-import { LogLevel } from '@slack/web-api';
 
 async function withEnv(envEntries, block) {
   const originalEnv = process.env;
@@ -18,7 +17,7 @@ async function withEnv(envEntries, block) {
 }
 
 describe('Boot up script (index)', () => {
-  const { app, BoltApp, db, knex, logger, clients, picky, slackOAuth, installer } = mockBootUpContext();
+  const {app, BoltApp, db, knex, logger, clients, picky, slackOAuth, installer} = mockBootUpContext();
 
   afterEach(async () => {
     jest.clearAllMocks();
@@ -46,7 +45,7 @@ describe('Boot up script (index)', () => {
               password: 'DATABASE_PASSWORD',
               database: 'DATABASE_NAME',
             },
-            pool: { min: 0, max: 4 },
+            pool: {min: 0, max: 4},
           });
         },
       );
@@ -113,7 +112,7 @@ describe('Boot up script (index)', () => {
     it('routes Slack app message events to the Picky onMessage callback', async () => {
       await import(`./../src/index.js?randomizer=${uuid()}`);
 
-      const payload = { event: {} };
+      const payload = {event: {}};
       await app.sendEvent('message', payload);
 
       expect(picky.onMessage).toHaveBeenCalledWith(payload);
@@ -123,7 +122,7 @@ describe('Boot up script (index)', () => {
       it('ignores the message', async () => {
         await import(`./../src/index.js?randomizer=${uuid()}`);
 
-        await app.sendEvent('message', { event: { bot_profile: { foo: 'bar' } } });
+        await app.sendEvent('message', {event: {bot_profile: {foo: 'bar'}}});
 
         expect(picky.onMessage).not.toHaveBeenCalled();
       });
@@ -133,7 +132,7 @@ describe('Boot up script (index)', () => {
       it('routes the event to the Picky onAppMention callback providing `replyAll: true`', async () => {
         await import(`./../src/index.js?randomizer=${uuid()}`);
 
-        const payload = { event: { channel_type: 'im' } };
+        const payload = {event: {channel_type: 'im'}};
         await app.sendEvent('message', payload);
 
         expect(picky.onAppMention).toHaveBeenCalledWith(payload, true);
@@ -145,7 +144,7 @@ describe('Boot up script (index)', () => {
 
       await import(`./../src/index.js?randomizer=${uuid()}`);
 
-      const payload = { event: {} };
+      const payload = {event: {}};
       await app.sendEvent('message', payload);
 
       assertThat(
@@ -159,7 +158,7 @@ describe('Boot up script (index)', () => {
     it('routes Slack app mention events to the Picky onAppMention callback', async () => {
       await import(`./../src/index.js?randomizer=${uuid()}`);
 
-      const payload = { event: {} };
+      const payload = {event: {}};
       await app.sendEvent('app_mention', payload);
 
       expect(picky.onAppMention).toHaveBeenCalledWith(payload);
@@ -169,7 +168,7 @@ describe('Boot up script (index)', () => {
       it('ignores the message', async () => {
         await import(`./../src/index.js?randomizer=${uuid()}`);
 
-        await app.sendEvent('app_mention', { event: { bot_profile: { foo: 'bar' } } });
+        await app.sendEvent('app_mention', {event: {bot_profile: {foo: 'bar'}}});
 
         expect(picky.onAppMention).not.toHaveBeenCalled();
       });
@@ -180,7 +179,7 @@ describe('Boot up script (index)', () => {
 
       await import(`./../src/index.js?randomizer=${uuid()}`);
 
-      const payload = { event: {} };
+      const payload = {event: {}};
       await app.sendEvent('app_mention', payload);
 
       assertThat(
@@ -194,7 +193,7 @@ describe('Boot up script (index)', () => {
     it('routes Slack app home opened events to the Picky onAppHomeOpened callback', async () => {
       await import(`./../src/index.js?randomizer=${uuid()}`);
 
-      const payload = { event: {} };
+      const payload = {event: {}};
       await app.sendEvent('app_home_opened', payload);
 
       expect(picky.onAppHomeOpened).toHaveBeenCalledWith(payload);
@@ -205,7 +204,7 @@ describe('Boot up script (index)', () => {
 
       await import(`./../src/index.js?randomizer=${uuid()}`);
 
-      const payload = { event: {} };
+      const payload = {event: {}};
       await app.sendEvent('app_home_opened', payload);
 
       assertThat(
@@ -235,7 +234,7 @@ describe('Boot up script (index)', () => {
 
     it('exchanges the received code for an access token', async () => {
       req = {
-        url: `/foo?${new URLSearchParams({ code: 'some code' }).toString()}`,
+        url: `/foo?${new URLSearchParams({code: 'some code'}).toString()}`,
       };
 
       await import(`./../src/index.js?randomizer=${uuid()}`);
@@ -247,9 +246,9 @@ describe('Boot up script (index)', () => {
 
     it('completes the installation of the app for the received team', async () => {
       const accessToken = 'some token';
-      const team = { id: 'team ID', name: 'team name' };
-      const enterprise = { id: 'enterprise ID', name: 'enterprise name' };
-      slackOAuth.access.mockResolvedValue({ accessToken, team, enterprise });
+      const team = {id: 'team ID', name: 'team name'};
+      const enterprise = {id: 'enterprise ID', name: 'enterprise name'};
+      slackOAuth.access.mockResolvedValue({accessToken, team, enterprise});
 
       await import(`./../src/index.js?randomizer=${uuid()}`);
 
@@ -265,7 +264,7 @@ describe('Boot up script (index)', () => {
 
       await app.receiver.routes['/oauth']['GET'](req, res);
 
-      expect(res.writeHead).toHaveBeenCalledWith(302, { Location: 'https://foo.slack.com' });
+      expect(res.writeHead).toHaveBeenCalledWith(302, {Location: 'https://foo.slack.com'});
       expect(res.end).toHaveBeenCalledWith('Success! You will now be redirected to https://foo.slack.com');
     });
   });
