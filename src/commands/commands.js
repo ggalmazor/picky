@@ -5,6 +5,7 @@ import ListCommand from './list-command.js';
 import IgnoreCommand from './ignore-command.js';
 import StopIgnoringCommand from './stop-ignoring-command.js';
 import ListIgnoredCommand from './list-ignored-command.js';
+import ReplaceCommand from './replace-command.js';
 
 const COMMANDS = [
   ForgetCommand,
@@ -14,6 +15,7 @@ const COMMANDS = [
   ListIgnoredCommand,
   IgnoreCommand,
   StopIgnoringCommand,
+  ReplaceCommand,
 ];
 
 export default class Commands {
