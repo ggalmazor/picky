@@ -89,5 +89,5 @@ async function start(app) {
   app.logger.info('⚡️ Bolt app is running!');
 }
 
-const app = await init().catch((error) => app.logger.error(error.stack));
-start(app).catch((error) => app.logger.error(error.stack));
+const app = await init().catch((error) => console.error(error.stack));
+start(app).catch((error) => console.error(error.stack));
