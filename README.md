@@ -19,6 +19,8 @@
 - [Stop ignoring an acronym](#stop-ignoring)
 - [List acronyms](#list)
 
+---
+
 ### Learn
 
 Picky can learn new acronym definitions.
@@ -26,6 +28,8 @@ Picky can learn new acronym definitions.
 Usage: `learn <acronym> <definition>`
 
 Example: `@picky learn HTML How To Make Lasagna`
+
+---
 
 ### Forget
 
@@ -38,6 +42,8 @@ Example: `@picky forget HTML How To Make Lasagna`
 Picky can also forget the acronym along with all existing definitions by omitting the definition in this command.
 
 Example: `@picky forget HTML`
+
+---
 
 ### Replace
 
@@ -53,6 +59,8 @@ This command is a combination of:
 @picky learn HTML How To Make Lasagna
 ```
 
+---
+
 ### Define
 
 Picky can provide the definition of acronyms.
@@ -63,6 +71,8 @@ Example: `@picky define HTML`
 
 Responds with: ``HTML stands for: `How To Make Lasagna` ``
 
+---
+
 ### Ignore
 
 Picky can ignore acronyms when people use them in chats.
@@ -71,6 +81,8 @@ Usage: `@picky ignore <acronym>`
 
 Example: `@picky ignore HTML`
 
+---
+
 ### Stop ignoring
 
 Picky can resume defining ignored acronyms.
@@ -78,6 +90,8 @@ Picky can resume defining ignored acronyms.
 Usage: `@picky stop ignoring <acronym>`
 
 Example: `@picky stop ignoring HTML`
+
+---
 
 ### List
 
