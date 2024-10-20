@@ -207,13 +207,24 @@ describe('Boot up script (index)', () => {
   });
 
   describe('listens to app_uninstalled events', () => {
-    it('triggers the uninstall operation with the team_id in the event', async () => {
+    it('triggers the uninstall operation with the team_id and enterprise_id in the payload', async () => {
       await import(`./../src/index.js?randomizer=${uuid()}`);
 
-      const payload = { event: { team_id: 'TEAMID' } };
+      const payload = { team_id: 'TEAMID', enterprise_id: 'ENTERPRISEID' };
       await app.sendEvent('app_uninstalled', payload);
 
-      expect(installer.uninstall).toHaveBeenCalledWith('TEAMID');
+      expect(installer.uninstall).toHaveBeenCalledWith('TEAMID', 'ENTERPRISEID');
+    });
+
+    describe("when the payload doesn't provide an enterprise ID", () => {
+      it('triggers the uninstall operation with the team_id only', async () => {
+        await import(`./../src/index.js?randomizer=${uuid()}`);
+
+        const payload = { team_id: 'TEAMID', enterprise_id: undefined };
+        await app.sendEvent('app_uninstalled', payload);
+
+        expect(installer.uninstall).toHaveBeenCalledWith('TEAMID', undefined);
+      });
     });
 
     it('adds a log message', async () => {
