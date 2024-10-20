@@ -13,14 +13,14 @@
 
 Picky can make it easier for new team members by allowing them to understand what everybody else is talking about.
 
-At Picky we're big fans of the "expose your ignorance" principle, but having the option to privately ask Picky about acronyms removes the awkwardness from the equation while a new team member gains confidence to do so in a public environment.
+We're big fans of the "expose your ignorance" principle at Picky, but having the option to privately ask Picky about acronyms removes the awkwardness from the equation while new team members gain the confidence to do so in a public environment.
 
 Here are some specific scenarios where Picky can help:
 
-- **Onboarding of new team members**: Onboarding new team members into the domain-specific language and idioms of a team is easier when Picky can explain the acronyms used by others.
+- **Onboarding of new team members**: Onboarding new team members into a team's domain-specific language and idioms is easier when Picky can explain the acronyms used by others.
 
-- **Helping non-native speakers blend in**: Non-native speaker team members might struggle with acronyms commonly used in the main language that's used to communicate in Slack. With Picky, you can finally what IIRC or BBIAB mean 🤷‍♀️.
-- **Ensure everyone's talking about the same thing**: Just in case, Picky can help focus the conversation on the same topic by explicitly communicating what the acronym really means. Was it "Continuous Delivery" or "Continuous Deployment"? 
+- **Helping non-native speakers blend in**: Non-native speaker team members might struggle with acronyms commonly used in the primary language used to communicate in Slack. With Picky, you can finally see what IIRC or BBIAB mean 🤷‍♀️.
+- **Ensure everyone's talking about the same thing**: Just in case, Picky can help focus the conversation on the same topic by explicitly communicating what the acronym means. Was it "Continuous Delivery" or "Continuous Deployment"? 
 
 ## Commands
 
@@ -52,7 +52,7 @@ Usage: `forget <acronym> [definition]`
 
 Example: `@picky forget HTML How To Make Lasagna`
 
-Picky can also forget the acronym along with all existing definitions by omitting the definition in this command.
+Picky can also forget the acronym and all existing definitions by omitting the definition in this command.
 
 Example: `@picky forget HTML`
 
@@ -108,7 +108,7 @@ Example: `@picky stop ignoring HTML`
 
 ### List
 
-Picky can list all the acronyms it knows with their definitions, and tells you if they're ignored.
+Picky can list all the acronyms it knows with their definitions and tell you if they're ignored.
 
 Usage: `@picky list [ignored]`
 
@@ -120,7 +120,7 @@ API stands for `Another Programmer’s Issue`
 HTML (ignored) stands for `How To Make Lasagna`
 ```
 
-Picky can also list only the ignored acronym by adding `ignored` to the command.
+Picky can list only the ignored acronym by adding `ignored` to the command.
 
 Example: `@picky list ignored`
 
