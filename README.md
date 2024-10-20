@@ -29,6 +29,21 @@ If no `definition` is provided, then Picky will forget the acronym along with an
 
 Picky will add a ✅ reaction when it's done and it will stop using it along when explaining the acronym.
 
+## Commands: Replace the definitions of an existing acronym
+
+You can make Picky replace all existing definitions of an acronym with a new one:
+```
+@picky replace <acronym> [definition]
+```
+
+This command is a combination of:
+```
+@picky forget <acronym>
+@picky learn <acronym> <definition>
+```
+
+Picky will add a ✅ reaction when it's done and will use the new definition moving forward.
+
 ## Commands: Define an acronym
 
 You can make Picky define an acronym:
