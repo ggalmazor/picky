@@ -9,6 +9,19 @@
 
 <a href="https://slack.com/oauth/v2/authorize?client_id=7828417850918.7820563959399&scope=app_mentions:read,channels:history,chat:write,im:history,im:write,reactions:write,team:read&user_scope="><img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcSet="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a>
 
+## How can Picky help your team?
+
+Picky can make it easier for new team members by allowing them to understand what everybody else is talking about.
+
+At Picky we're big fans of the "expose your ignorance" principle, but having the option to privately ask Picky about acronyms removes the awkwardness from the equation while a new team member gains confidence to do so in a public environment.
+
+Here are some specific scenarios where Picky can help:
+
+- **Onboarding of new team members**: Onboarding new team members into the domain-specific language and idioms of a team is easier when Picky can explain the acronyms used by others.
+
+- **Helping non-native speakers blend in**: Non-native speaker team members might struggle with acronyms commonly used in the main language that's used to communicate in Slack. With Picky, you can finally what IIRC or BBIAB mean 🤷‍♀️.
+- **Ensure everyone's talking about the same thing**: Just in case, Picky can help focus the conversation on the same topic by explicitly communicating what the acronym really means. Was it "Continuous Delivery" or "Continuous Deployment"? 
+
 ## Commands
 
 - [Learn an acronym](#learn)
