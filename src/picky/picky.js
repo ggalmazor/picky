@@ -69,15 +69,16 @@ export default class Picky {
     const acronyms = await this.brain.list(context);
     const options = (
       await Promise.all(
-        Object.keys(acronyms).map(async (acronym) =>
-          acronyms[acronym].map((definition) => ({
+        Object.keys(acronyms).map(async (acronym) => {
+          const ignored = await this.brain.isIgnored(context, acronym);
+          return acronyms[acronym].map((definition) => ({
             value: `${acronym} ${definition}`,
             text: {
               type: 'plain_text',
-              text: `${acronym}: ${definition}`,
+              text: `${acronym}${ignored ? ' (ignored) ' : ''}: ${definition}`,
             },
-          })),
-        ),
+          }));
+        }),
       )
     ).flat();
 
