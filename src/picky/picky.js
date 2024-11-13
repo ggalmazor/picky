@@ -83,6 +83,34 @@ export default class Picky {
         {
           type: 'divider',
         },
+        {
+          type: 'section',
+          text: {
+            type: 'plain_text',
+            text: 'List of existing acronyms',
+          },
+          accessory: {
+            type: 'checkboxes',
+            action_id: 'delete_definitions',
+            initial_options: [],
+            options: [
+              {
+                value: 'ABC Another Beautiful Croquette',
+                text: {
+                  type: 'plain_text',
+                  text: 'ABC: Another Beautiful Croquette',
+                },
+              },
+              {
+                value: 'DEF Definitely Enough Focaccia',
+                text: {
+                  type: 'plain_text',
+                  text: 'DEF: Definitely Enough Focaccia',
+                },
+              },
+            ],
+          },
+        },
       ],
     };
 
