@@ -130,11 +130,11 @@ export default class Picky {
                 },
                 confirm: {
                   type: 'plain_text',
-                  text: 'Do it',
+                  text: 'Yes',
                 },
                 deny: {
                   type: 'plain_text',
-                  text: "Stop, I've changed my mind!",
+                  text: "No",
                 },
               },
             },
