@@ -134,7 +134,7 @@ export default class Picky {
                 },
                 deny: {
                   type: 'plain_text',
-                  text: "No",
+                  text: 'No',
                 },
               },
             },
