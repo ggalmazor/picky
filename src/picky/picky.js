@@ -111,6 +111,34 @@ export default class Picky {
             ],
           },
         },
+        {
+          type: 'actions',
+          elements: [
+            {
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                text: 'Delete selected definitions',
+              },
+              style: 'danger',
+              action_id: 'delete_selected_definitions',
+              confirm: {
+                title: {
+                  type: 'plain_text',
+                  text: 'Are you sure?',
+                },
+                confirm: {
+                  type: 'plain_text',
+                  text: 'Do it',
+                },
+                deny: {
+                  type: 'plain_text',
+                  text: "Stop, I've changed my mind!",
+                },
+              },
+            },
+          ],
+        },
       ],
     };
 
