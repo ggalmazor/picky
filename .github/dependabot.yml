@@ -11,9 +11,3 @@ updates:
       interval: "weekly"
     assignees: 
       - "ggalmazor"
-    groups:
-      runtime:
-        dependency-type: "production"
-      development:
-        dependency-type: "development"
-    
